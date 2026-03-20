@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from "react";
@@ -9,6 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { ClipboardCheck, FileText, Activity, ShieldCheck, Plus, Download, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { exportToCSV } from "@/lib/utils";
 
 export default function QualityPage() {
   const { toast } = useToast();
@@ -22,12 +22,13 @@ export default function QualityPage() {
     });
 
     setTimeout(() => {
+      exportToCSV(QUALITY_REPORTS, "FactoryIQ_Quality_Reports");
       setIsExporting(false);
       toast({
         title: "Logs Exported",
         description: "Quality incident history has been downloaded.",
       });
-    }, 2000);
+    }, 1500);
   };
 
   const handleNewIncident = () => {

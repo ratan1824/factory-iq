@@ -33,6 +33,7 @@ import { collection, serverTimestamp } from "firebase/firestore";
 import { addDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
+import { useEffect } from "react";
 
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -63,6 +64,13 @@ export function CreateProgramDialog({ open, onOpenChange }: CreateProgramDialogP
     },
   });
 
+  // Critical fix for unresponsiveness: ensure pointer events are restored when dialog closes
+  useEffect(() => {
+    if (!open) {
+      document.body.style.pointerEvents = 'auto';
+    }
+  }, [open]);
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     if (!user || !firestore) return;
 
@@ -90,13 +98,10 @@ export function CreateProgramDialog({ open, onOpenChange }: CreateProgramDialogP
         description: "Program initialization sequence started.",
       });
       
-      // We use a small timeout to allow Radix UI to finish its internal processing
-      // before we close the dialog, which prevents the body from staying unresponsive.
-      setTimeout(() => {
-        onOpenChange(false);
-        form.reset();
-      }, 100);
-
+      // Close first, then reset to avoid internal state races
+      onOpenChange(false);
+      form.reset();
+      
     } catch (error) {
       toast({
         variant: "destructive",
@@ -108,7 +113,13 @@ export function CreateProgramDialog({ open, onOpenChange }: CreateProgramDialogP
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px] glass-card border-white/10 bg-slate-950/90 backdrop-blur-2xl rounded-3xl overflow-hidden text-white">
+      <DialogContent 
+        className="sm:max-w-[425px] glass-card border-white/10 bg-slate-950/90 backdrop-blur-2xl rounded-3xl overflow-hidden text-white"
+        onInteractOutside={(e) => {
+          // Prevent accidental background clicks from locking up if needed
+          document.body.style.pointerEvents = 'auto';
+        }}
+      >
         <DialogHeader>
           <DialogTitle className="text-xl font-black uppercase tracking-tight text-white">Create New Program</DialogTitle>
           <DialogDescription className="text-slate-400 text-xs font-medium">

@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from "react";
@@ -9,6 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { Truck, Package, ShoppingCart, Globe, ArrowUpRight, Download, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { exportToCSV } from "@/lib/utils";
 
 export default function SupplyChainPage() {
   const { toast } = useToast();
@@ -22,12 +22,13 @@ export default function SupplyChainPage() {
     });
 
     setTimeout(() => {
+      exportToCSV(SUPPLY_CHAIN_POS, "FactoryIQ_SupplyChain_Orders");
       setIsExporting(false);
       toast({
         title: "Export Success",
         description: "Supply chain records saved to workstation.",
       });
-    }, 2000);
+    }, 1500);
   };
 
   const handleNewPO = () => {

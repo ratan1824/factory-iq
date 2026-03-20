@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useMemo } from "react";
@@ -7,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { PROGRAMS as MOCK_PROGRAMS, Program } from "@/lib/mock-data";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { cn } from "@/lib/utils";
+import { cn, exportToCSV } from "@/lib/utils";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Download, Filter, Search, ArrowUpDown, ChevronRight, Loader2 } from "lucide-react";
@@ -48,7 +47,7 @@ export default function ProgramsPage() {
         return sortOrder === "asc" ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
       }
       if (typeof aVal === 'number' && typeof bVal === 'number') {
-        return sortOrder === "asc" ? (aVal || 0) - (bVal || 0) : (bVal || 0) - (aVal || 0);
+        return sortOrder === "asc" ? (Number(aVal) || 0) - (Number(bVal) || 0) : (Number(bVal) || 0) - (Number(aVal) || 0);
       }
       return 0;
     });
@@ -61,13 +60,28 @@ export default function ProgramsPage() {
       description: "Compiling portfolio performance data...",
     });
 
+    // Real CSV Export
     setTimeout(() => {
+      const exportData = filteredPrograms.map(p => ({
+        ID: p.id,
+        Name: p.name,
+        Manager: p.manager,
+        Status: p.status,
+        Phase: p.phase,
+        Site: p.site,
+        Completion: `${p.completion}%`,
+        StartDate: p.startDate,
+        EndDate: p.endDate
+      }));
+      
+      exportToCSV(exportData, "FactoryIQ_Programs");
+      
       setIsExporting(false);
       toast({
         title: "Export Ready",
-        description: "Portfolio data has been downloaded as CSV.",
+        description: "Portfolio data has been downloaded.",
       });
-    }, 2000);
+    }, 1000);
   };
 
   const toggleSort = (field: keyof Program) => {
