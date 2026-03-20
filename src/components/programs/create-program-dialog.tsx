@@ -64,7 +64,7 @@ export function CreateProgramDialog({ open, onOpenChange }: CreateProgramDialogP
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    if (!user) return;
+    if (!user || !firestore) return;
 
     try {
       const programsRef = collection(firestore, "programs");
@@ -82,7 +82,7 @@ export function CreateProgramDialog({ open, onOpenChange }: CreateProgramDialogP
         }
       };
 
-      // Initiate write without awaiting to maintain responsive UI
+      // Initiate write
       addDocumentNonBlocking(programsRef, programData);
       
       toast({
@@ -90,8 +90,13 @@ export function CreateProgramDialog({ open, onOpenChange }: CreateProgramDialogP
         description: "Program initialization sequence started.",
       });
       
-      form.reset();
-      onOpenChange(false);
+      // We use a small timeout to allow Radix UI to finish its internal processing
+      // before we close the dialog, which prevents the body from staying unresponsive.
+      setTimeout(() => {
+        onOpenChange(false);
+        form.reset();
+      }, 100);
+
     } catch (error) {
       toast({
         variant: "destructive",
@@ -103,7 +108,7 @@ export function CreateProgramDialog({ open, onOpenChange }: CreateProgramDialogP
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px] glass-card border-white/10 bg-slate-950/90 backdrop-blur-2xl rounded-3xl overflow-hidden">
+      <DialogContent className="sm:max-w-[425px] glass-card border-white/10 bg-slate-950/90 backdrop-blur-2xl rounded-3xl overflow-hidden text-white">
         <DialogHeader>
           <DialogTitle className="text-xl font-black uppercase tracking-tight text-white">Create New Program</DialogTitle>
           <DialogDescription className="text-slate-400 text-xs font-medium">
@@ -119,9 +124,9 @@ export function CreateProgramDialog({ open, onOpenChange }: CreateProgramDialogP
                 <FormItem>
                   <FormLabel className="text-[10px] font-black uppercase tracking-widest text-slate-500">Program Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g. NextGen Turbine X2" {...field} className="bg-white/5 border-white/10 rounded-xl h-11 focus-visible:ring-primary/20" />
+                    <Input placeholder="e.g. NextGen Turbine X2" {...field} className="bg-white/5 border-white/10 rounded-xl h-11 focus-visible:ring-primary/20 text-white" />
                   </FormControl>
-                  <FormMessage className="text-[10px]" />
+                  <FormMessage className="text-[10px] text-rose-500" />
                 </FormItem>
               )}
             />
@@ -132,9 +137,9 @@ export function CreateProgramDialog({ open, onOpenChange }: CreateProgramDialogP
                 <FormItem>
                   <FormLabel className="text-[10px] font-black uppercase tracking-widest text-slate-500">Manufacturing Site</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g. Shanghai Giga" {...field} className="bg-white/5 border-white/10 rounded-xl h-11 focus-visible:ring-primary/20" />
+                    <Input placeholder="e.g. Shanghai Giga" {...field} className="bg-white/5 border-white/10 rounded-xl h-11 focus-visible:ring-primary/20 text-white" />
                   </FormControl>
-                  <FormMessage className="text-[10px]" />
+                  <FormMessage className="text-[10px] text-rose-500" />
                 </FormItem>
               )}
             />
@@ -147,11 +152,11 @@ export function CreateProgramDialog({ open, onOpenChange }: CreateProgramDialogP
                     <FormLabel className="text-[10px] font-black uppercase tracking-widest text-slate-500">Initial Status</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
-                        <SelectTrigger className="bg-white/5 border-white/10 rounded-xl h-11 focus:ring-primary/20">
+                        <SelectTrigger className="bg-white/5 border-white/10 rounded-xl h-11 focus:ring-primary/20 text-white">
                           <SelectValue placeholder="Status" />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent className="glass-card border-white/10 bg-slate-900">
+                      <SelectContent className="glass-card border-white/10 bg-slate-900 text-white">
                         <SelectItem value="Green">Green</SelectItem>
                         <SelectItem value="Yellow">Yellow</SelectItem>
                         <SelectItem value="Red">Red</SelectItem>
@@ -168,11 +173,11 @@ export function CreateProgramDialog({ open, onOpenChange }: CreateProgramDialogP
                     <FormLabel className="text-[10px] font-black uppercase tracking-widest text-slate-500">Current Phase</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
-                        <SelectTrigger className="bg-white/5 border-white/10 rounded-xl h-11 focus:ring-primary/20">
+                        <SelectTrigger className="bg-white/5 border-white/10 rounded-xl h-11 focus:ring-primary/20 text-white">
                           <SelectValue placeholder="Phase" />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent className="glass-card border-white/10 bg-slate-900">
+                      <SelectContent className="glass-card border-white/10 bg-slate-900 text-white">
                         <SelectItem value="R&D">R&D</SelectItem>
                         <SelectItem value="NPI">NPI</SelectItem>
                         <SelectItem value="Production">Production</SelectItem>
@@ -189,14 +194,14 @@ export function CreateProgramDialog({ open, onOpenChange }: CreateProgramDialogP
                 <FormItem>
                   <FormLabel className="text-[10px] font-black uppercase tracking-widest text-slate-500">Brief Description</FormLabel>
                   <FormControl>
-                    <Input placeholder="Scope and objectives..." {...field} className="bg-white/5 border-white/10 rounded-xl h-11 focus-visible:ring-primary/20" />
+                    <Input placeholder="Scope and objectives..." {...field} className="bg-white/5 border-white/10 rounded-xl h-11 focus-visible:ring-primary/20 text-white" />
                   </FormControl>
-                  <FormMessage className="text-[10px]" />
+                  <FormMessage className="text-[10px] text-rose-500" />
                 </FormItem>
               )}
             />
             <DialogFooter className="pt-4">
-              <Button type="submit" className="w-full h-11 rounded-xl bg-primary hover:bg-primary/90 font-black text-xs uppercase tracking-widest transition-all">
+              <Button type="submit" className="w-full h-11 rounded-xl bg-primary hover:bg-primary/90 font-black text-xs uppercase tracking-widest transition-all text-white">
                 {form.formState.isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Create Program
               </Button>
