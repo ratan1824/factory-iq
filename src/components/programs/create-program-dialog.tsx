@@ -29,7 +29,7 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { useFirestore, useUser } from "@/firebase";
-import { collection, doc, serverTimestamp } from "firebase/firestore";
+import { collection, serverTimestamp } from "firebase/firestore";
 import { addDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
@@ -48,8 +48,8 @@ interface CreateProgramDialogProps {
 }
 
 export function CreateProgramDialog({ open, onOpenChange }: CreateProgramDialogProps) {
-  const { firestore } = useFirestore();
-  const { user } = useUser();
+  const firestore = useFirestore();
+  const { user, profile } = useUser();
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -70,8 +70,9 @@ export function CreateProgramDialog({ open, onOpenChange }: CreateProgramDialogP
       const programsRef = collection(firestore, "programs");
       const programData = {
         ...values,
+        id: `PRJ-${Math.floor(1000 + Math.random() * 9000)}`,
         ownerId: user.uid,
-        manager: user.displayName || "Ratan Kollabathula",
+        manager: profile?.firstName ? `${profile.firstName} ${profile.lastName}` : "Ratan Kollabathula",
         completion: 0,
         startDate: new Date().toISOString().split('T')[0],
         createdAt: serverTimestamp(),
@@ -81,11 +82,12 @@ export function CreateProgramDialog({ open, onOpenChange }: CreateProgramDialogP
         }
       };
 
+      // Initiate write without awaiting to maintain responsive UI
       addDocumentNonBlocking(programsRef, programData);
       
       toast({
         title: "Success",
-        description: "Program has been created and initialized.",
+        description: "Program initialization sequence started.",
       });
       
       form.reset();
@@ -94,17 +96,17 @@ export function CreateProgramDialog({ open, onOpenChange }: CreateProgramDialogP
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to create program. Please try again.",
+        description: "Failed to initialize program. Please try again.",
       });
     }
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] glass-card border-white/10 bg-slate-950/90 backdrop-blur-2xl rounded-3xl overflow-hidden">
         <DialogHeader>
-          <DialogTitle>Create New Program</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-xl font-black uppercase tracking-tight text-white">Create New Program</DialogTitle>
+          <DialogDescription className="text-slate-400 text-xs font-medium">
             Initialize a new manufacturing program. Fill in the baseline details.
           </DialogDescription>
         </DialogHeader>
@@ -115,11 +117,11 @@ export function CreateProgramDialog({ open, onOpenChange }: CreateProgramDialogP
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Program Name</FormLabel>
+                  <FormLabel className="text-[10px] font-black uppercase tracking-widest text-slate-500">Program Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g. NextGen Turbine X2" {...field} />
+                    <Input placeholder="e.g. NextGen Turbine X2" {...field} className="bg-white/5 border-white/10 rounded-xl h-11 focus-visible:ring-primary/20" />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-[10px]" />
                 </FormItem>
               )}
             />
@@ -128,11 +130,11 @@ export function CreateProgramDialog({ open, onOpenChange }: CreateProgramDialogP
               name="site"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Manufacturing Site</FormLabel>
+                  <FormLabel className="text-[10px] font-black uppercase tracking-widest text-slate-500">Manufacturing Site</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g. Shanghai Giga" {...field} />
+                    <Input placeholder="e.g. Shanghai Giga" {...field} className="bg-white/5 border-white/10 rounded-xl h-11 focus-visible:ring-primary/20" />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-[10px]" />
                 </FormItem>
               )}
             />
@@ -142,14 +144,14 @@ export function CreateProgramDialog({ open, onOpenChange }: CreateProgramDialogP
                 name="status"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Initial Status</FormLabel>
+                    <FormLabel className="text-[10px] font-black uppercase tracking-widest text-slate-500">Initial Status</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
-                        <SelectTrigger>
+                        <SelectTrigger className="bg-white/5 border-white/10 rounded-xl h-11 focus:ring-primary/20">
                           <SelectValue placeholder="Status" />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent>
+                      <SelectContent className="glass-card border-white/10 bg-slate-900">
                         <SelectItem value="Green">Green</SelectItem>
                         <SelectItem value="Yellow">Yellow</SelectItem>
                         <SelectItem value="Red">Red</SelectItem>
@@ -163,14 +165,14 @@ export function CreateProgramDialog({ open, onOpenChange }: CreateProgramDialogP
                 name="phase"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Current Phase</FormLabel>
+                    <FormLabel className="text-[10px] font-black uppercase tracking-widest text-slate-500">Current Phase</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
-                        <SelectTrigger>
+                        <SelectTrigger className="bg-white/5 border-white/10 rounded-xl h-11 focus:ring-primary/20">
                           <SelectValue placeholder="Phase" />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent>
+                      <SelectContent className="glass-card border-white/10 bg-slate-900">
                         <SelectItem value="R&D">R&D</SelectItem>
                         <SelectItem value="NPI">NPI</SelectItem>
                         <SelectItem value="Production">Production</SelectItem>
@@ -185,16 +187,16 @@ export function CreateProgramDialog({ open, onOpenChange }: CreateProgramDialogP
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Brief Description</FormLabel>
+                  <FormLabel className="text-[10px] font-black uppercase tracking-widest text-slate-500">Brief Description</FormLabel>
                   <FormControl>
-                    <Input placeholder="Scope and objectives..." {...field} />
+                    <Input placeholder="Scope and objectives..." {...field} className="bg-white/5 border-white/10 rounded-xl h-11 focus-visible:ring-primary/20" />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-[10px]" />
                 </FormItem>
               )}
             />
             <DialogFooter className="pt-4">
-              <Button type="submit" className="w-full">
+              <Button type="submit" className="w-full h-11 rounded-xl bg-primary hover:bg-primary/90 font-black text-xs uppercase tracking-widest transition-all">
                 {form.formState.isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Create Program
               </Button>
