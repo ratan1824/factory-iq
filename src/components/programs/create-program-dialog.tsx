@@ -64,10 +64,15 @@ export function CreateProgramDialog({ open, onOpenChange }: CreateProgramDialogP
     },
   });
 
-  // Critical fix for unresponsiveness: ensure pointer events are restored when dialog closes
+  // ROBUST FIX: Ensure pointer events are always restored to the body when the dialog closes.
+  // This prevents the "unresponsive" state where you can't click anything.
   useEffect(() => {
     if (!open) {
-      document.body.style.pointerEvents = 'auto';
+      const timer = setTimeout(() => {
+        document.body.style.pointerEvents = 'auto';
+        document.body.style.overflow = 'auto';
+      }, 100);
+      return () => clearTimeout(timer);
     }
   }, [open]);
 
@@ -98,9 +103,13 @@ export function CreateProgramDialog({ open, onOpenChange }: CreateProgramDialogP
         description: "Program initialization sequence started.",
       });
       
-      // Close first, then reset to avoid internal state races
+      // Close the dialog immediately
       onOpenChange(false);
-      form.reset();
+      
+      // Reset form after a short delay to ensure modal transition is finished
+      setTimeout(() => {
+        form.reset();
+      }, 300);
       
     } catch (error) {
       toast({
@@ -115,9 +124,8 @@ export function CreateProgramDialog({ open, onOpenChange }: CreateProgramDialogP
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent 
         className="sm:max-w-[425px] glass-card border-white/10 bg-slate-950/90 backdrop-blur-2xl rounded-3xl overflow-hidden text-white"
-        onInteractOutside={(e) => {
-          // Prevent accidental background clicks from locking up if needed
-          document.body.style.pointerEvents = 'auto';
+        onInteractOutside={() => {
+          onOpenChange(false);
         }}
       >
         <DialogHeader>
