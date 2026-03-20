@@ -1,28 +1,44 @@
-
 "use client";
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { PROGRAMS, Program } from "@/lib/mock-data";
+import { Card, CardContent } from "@/components/ui/card";
+import { PROGRAMS as MOCK_PROGRAMS, Program } from "@/lib/mock-data";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
-import { Download, Filter, Search, ArrowUpDown, ChevronRight } from "lucide-react";
+import { Download, Filter, Search, ArrowUpDown, ChevronRight, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { useCollection, useMemoFirebase, useFirestore } from "@/firebase";
+import { collection, query, orderBy } from "firebase/firestore";
 
 export default function ProgramsPage() {
   const [search, setSearch] = useState("");
   const [sortField, setSortField] = useState<keyof Program>("name");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  
+  const firestore = useFirestore();
+  const programsQuery = useMemoFirebase(
+    () => query(collection(firestore, "programs"), orderBy("createdAt", "desc")),
+    [firestore]
+  );
+  const { data: firestorePrograms, isLoading } = useCollection<Program>(programsQuery);
+
+  // Merge Firestore data with Mock data for a "full" portfolio feel during prototyping
+  const allPrograms = useMemo(() => {
+    const fsData = firestorePrograms || [];
+    // Filter out mock programs that might have the same ID as real ones
+    const fsIds = new Set(fsData.map(p => p.id));
+    return [...fsData, ...MOCK_PROGRAMS.filter(p => !fsIds.has(p.id))];
+  }, [firestorePrograms]);
 
   const filteredPrograms = useMemo(() => {
-    return PROGRAMS.filter((p) => 
+    return allPrograms.filter((p) => 
       p.name.toLowerCase().includes(search.toLowerCase()) || 
       p.id.toLowerCase().includes(search.toLowerCase()) ||
-      p.manager.toLowerCase().includes(search.toLowerCase())
+      (p.manager && p.manager.toLowerCase().includes(search.toLowerCase()))
     ).sort((a, b) => {
       const aVal = a[sortField];
       const bVal = b[sortField];
@@ -30,11 +46,11 @@ export default function ProgramsPage() {
         return sortOrder === "asc" ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
       }
       if (typeof aVal === 'number' && typeof bVal === 'number') {
-        return sortOrder === "asc" ? aVal - bVal : bVal - aVal;
+        return sortOrder === "asc" ? (aVal || 0) - (bVal || 0) : (bVal || 0) - (aVal || 0);
       }
       return 0;
     });
-  }, [search, sortField, sortOrder]);
+  }, [search, sortField, sortOrder, allPrograms]);
 
   const toggleSort = (field: keyof Program) => {
     if (sortField === field) {
@@ -72,9 +88,9 @@ export default function ProgramsPage() {
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        <div className="flex gap-2">
-          <Badge variant="secondary" className="px-4 py-1.5 rounded-full bg-primary/20 text-primary-foreground border-none font-bold uppercase tracking-wider text-[10px]">{filteredPrograms.length} Active</Badge>
-          <Badge variant="outline" className="px-4 py-1.5 rounded-full border-white/10 text-muted-foreground font-bold uppercase tracking-wider text-[10px]">2 Archived</Badge>
+        <div className="flex gap-2 items-center">
+          {isLoading && <Loader2 className="h-4 w-4 animate-spin text-primary mr-2" />}
+          <Badge variant="secondary" className="px-4 py-1.5 rounded-full bg-primary/20 text-primary-foreground border-none font-bold uppercase tracking-wider text-[10px]">{filteredPrograms.length} Total</Badge>
         </div>
       </div>
 
@@ -115,16 +131,16 @@ export default function ProgramsPage() {
                     </Badge>
                   </TableCell>
                   <TableCell className="text-xs font-medium text-slate-400">{program.site}</TableCell>
-                  <TableCell className="text-sm text-slate-400 font-medium">{program.manager}</TableCell>
+                  <TableCell className="text-sm text-slate-400 font-medium">{program.manager || 'N/A'}</TableCell>
                   <TableCell>
                     <Badge variant="outline" className="border-accent/20 text-accent bg-accent/10 rounded-full text-[10px] font-bold uppercase tracking-widest px-3">{program.phase}</Badge>
                   </TableCell>
                   <TableCell>
                     <div className="space-y-1.5">
                       <div className="flex justify-between text-[9px] font-black uppercase text-muted-foreground tracking-[0.1em]">
-                        <span>{program.completion}% COMPLETED</span>
+                        <span>{program.completion || 0}% COMPLETED</span>
                       </div>
-                      <Progress value={program.completion} className="h-1.5 bg-white/5" />
+                      <Progress value={program.completion || 0} className="h-1.5 bg-white/5" />
                     </div>
                   </TableCell>
                   <TableCell className="text-right">

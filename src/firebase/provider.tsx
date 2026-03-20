@@ -1,18 +1,10 @@
-
 'use client';
 
 import React, { DependencyList, createContext, useContext, ReactNode, useMemo, useState, useEffect } from 'react';
 import { FirebaseApp } from 'firebase/app';
-import { Firestore, doc, getDoc, onSnapshot } from 'firebase/firestore';
-import { Auth, User, onAuthStateChanged } from 'firebase/auth';
+import { Firestore, doc, onSnapshot } from 'firebase/firestore';
+import { Auth, onAuthStateChanged, User } from 'firebase/auth';
 import { FirebaseErrorListener } from '@/components/FirebaseErrorListener'
-
-interface FirebaseProviderProps {
-  children: ReactNode;
-  firebaseApp: FirebaseApp;
-  firestore: Firestore;
-  auth: Auth;
-}
 
 interface UserProfile {
   id: string;
@@ -38,12 +30,12 @@ export interface FirebaseContextState extends UserAuthState {
 
 export const FirebaseContext = createContext<FirebaseContextState | undefined>(undefined);
 
-export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
-  children,
-  firebaseApp,
-  firestore,
-  auth,
-}) => {
+export const FirebaseProvider: React.FC<{
+  children: ReactNode;
+  firebaseApp: FirebaseApp;
+  firestore: Firestore;
+  auth: Auth;
+}> = ({ children, firebaseApp, firestore, auth }) => {
   const [userAuthState, setUserAuthState] = useState<UserAuthState>({
     user: null,
     profile: null,
@@ -52,42 +44,51 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
   });
 
   useEffect(() => {
-    if (!auth || !firestore) {
-      setUserAuthState(prev => ({ ...prev, isUserLoading: false }));
-      return;
-    }
+    let unsubscribeProfile: (() => void) | null = null;
 
     const unsubscribeAuth = onAuthStateChanged(
       auth,
-      async (firebaseUser) => {
+      (firebaseUser) => {
+        // Cleanup previous profile listener if it exists
+        if (unsubscribeProfile) {
+          unsubscribeProfile();
+          unsubscribeProfile = null;
+        }
+
         if (firebaseUser) {
-          // Listen to user profile changes
           const userDocRef = doc(firestore, 'users', firebaseUser.uid);
-          const unsubscribeProfile = onSnapshot(userDocRef, (docSnap) => {
-            if (docSnap.exists()) {
-              setUserAuthState({
-                user: firebaseUser,
-                profile: docSnap.data() as UserProfile,
-                isUserLoading: false,
-                userError: null,
-              });
-            } else {
-              // Fallback for new users or missing profiles in demo
-              setUserAuthState({
-                user: firebaseUser,
-                profile: {
-                  id: firebaseUser.uid,
-                  role: firebaseUser.email?.includes('admin') ? 'owner' : 'user',
-                  firstName: firebaseUser.displayName?.split(' ')[0] || 'User',
-                  lastName: firebaseUser.displayName?.split(' ')[1] || '',
-                  email: firebaseUser.email || '',
-                },
-                isUserLoading: false,
-                userError: null,
-              });
+          unsubscribeProfile = onSnapshot(
+            userDocRef,
+            (docSnap) => {
+              if (docSnap.exists()) {
+                setUserAuthState({
+                  user: firebaseUser,
+                  profile: docSnap.data() as UserProfile,
+                  isUserLoading: false,
+                  userError: null,
+                });
+              } else {
+                // Handle missing profile by providing a sensible default for demo/anonymous users
+                setUserAuthState({
+                  user: firebaseUser,
+                  profile: {
+                    id: firebaseUser.uid,
+                    role: 'user', // Default to restricted role until setDoc completes
+                    firstName: firebaseUser.displayName?.split(' ')[0] || 'Guest',
+                    lastName: firebaseUser.displayName?.split(' ')[1] || 'User',
+                    email: firebaseUser.email || '',
+                  },
+                  isUserLoading: false,
+                  userError: null,
+                });
+              }
+            },
+            (error) => {
+              console.error("Profile listener error:", error);
+              // Don't crash the app, just keep the last known state or clear it
+              setUserAuthState(prev => ({ ...prev, isUserLoading: false }));
             }
-          });
-          return () => unsubscribeProfile();
+          );
         } else {
           setUserAuthState({ user: null, profile: null, isUserLoading: false, userError: null });
         }
@@ -96,7 +97,11 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
         setUserAuthState(prev => ({ ...prev, isUserLoading: false, userError: error }));
       }
     );
-    return () => unsubscribeAuth();
+
+    return () => {
+      unsubscribeAuth();
+      if (unsubscribeProfile) unsubscribeProfile();
+    };
   }, [auth, firestore]);
 
   const contextValue = useMemo((): FirebaseContextState => {

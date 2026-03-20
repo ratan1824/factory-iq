@@ -1,8 +1,8 @@
-
 "use client";
 
+import { useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { DASHBOARD_STATS, PRODUCTION_DATA, ALERTS, PROGRAMS } from "@/lib/mock-data";
+import { DASHBOARD_STATS, PRODUCTION_DATA, ALERTS as MOCK_ALERTS } from "@/lib/mock-data";
 import { 
   BarChart, 
   Bar, 
@@ -12,11 +12,23 @@ import {
   Tooltip, 
   ResponsiveContainer 
 } from "recharts";
-import { Badge } from "@/components/ui/badge";
 import { AlertCircle, ArrowUpRight, ArrowDownRight, Info, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useCollection, useMemoFirebase, useFirestore } from "@/firebase";
+import { collection, query, limit, orderBy } from "firebase/firestore";
 
 export default function DashboardPage() {
+  const firestore = useFirestore();
+  const alertsQuery = useMemoFirebase(
+    () => query(collection(firestore, "alerts"), orderBy("timestamp", "desc"), limit(5)),
+    [firestore]
+  );
+  const { data: firestoreAlerts } = useCollection(alertsQuery);
+
+  const displayAlerts = useMemo(() => {
+    return firestoreAlerts && firestoreAlerts.length > 0 ? firestoreAlerts : MOCK_ALERTS;
+  }, [firestoreAlerts]);
+
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
       <div>
@@ -80,22 +92,22 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {ALERTS.map((alert) => (
+              {displayAlerts.map((alert: any) => (
                 <div key={alert.id} className="flex items-start gap-4 rounded-xl border border-white/5 p-3 hover:bg-white/5 transition-all">
                   <div className={cn(
                     "mt-1 flex h-8 w-8 items-center justify-center rounded-lg",
-                    alert.type === 'critical' ? "bg-rose-500/10 text-rose-500" :
-                    alert.type === 'warning' ? "bg-amber-500/10 text-amber-500" : "bg-blue-500/10 text-blue-500"
+                    alert.type === 'critical' || alert.severity === 'High' ? "bg-rose-500/10 text-rose-500" :
+                    alert.type === 'warning' || alert.severity === 'Medium' ? "bg-amber-500/10 text-amber-500" : "bg-blue-500/10 text-blue-500"
                   )}>
-                    {alert.type === 'critical' ? <AlertCircle className="h-4 w-4" /> :
-                     alert.type === 'warning' ? <AlertTriangle className="h-4 w-4" /> : <Info className="h-4 w-4" />}
+                    {alert.type === 'critical' || alert.severity === 'High' ? <AlertCircle className="h-4 w-4" /> :
+                     alert.type === 'warning' || alert.severity === 'Medium' ? <AlertTriangle className="h-4 w-4" /> : <Info className="h-4 w-4" />}
                   </div>
                   <div className="flex-1 space-y-1">
                     <div className="flex items-center justify-between">
-                      <p className="text-sm font-semibold leading-none">{alert.title}</p>
-                      <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">{alert.time}</span>
+                      <p className="text-sm font-semibold leading-none">{alert.title || alert.message}</p>
+                      <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">{alert.time || 'Live'}</span>
                     </div>
-                    <p className="text-xs text-muted-foreground line-clamp-2">{alert.description}</p>
+                    <p className="text-xs text-muted-foreground line-clamp-2">{alert.description || alert.type}</p>
                   </div>
                 </div>
               ))}

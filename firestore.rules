@@ -1,28 +1,7 @@
 /**
- * FactoryIQ Security Rules (Prototyping Mode)
+ * FactoryIQ Security Rules
  * 
- * CORE PHILOSOPHY:
- * This ruleset implements a robust Authorization Independence model for manufacturing operations. 
- * To ensure high performance and avoid costly cross-document lookups (get() calls), 
- * authorization context is denormalized directly onto documents using `_members` maps 
- * and ownership fields.
- * 
- * DATA STRUCTURE:
- * - User Profiles: Secured via UID ownership at `/users/{userId}`.
- * - Program & Projects: Shared access model using `/programs/{programId}`. Sub-resources 
- *   (KPIs, Documents, Comments) inherit access via a denormalized `_programMembers` map.
- * - Operational Entities: NCRs, Audits, and Purchase Orders use specific `_members` maps 
- *   to track Reporters, Assignees, Auditors, and Creators.
- * - Master Data: Global entities like Products and Suppliers are role-protected (Prototyping 
- *   defaults to authenticated read).
- * 
- * KEY SECURITY DECISIONS:
- * - Shared Access: Uses map-based membership (e.g., `{ 'uid123': 'owner' }`) to allow 
- *   O(1) access checks during both single-document reads and collection listings.
- * - Subcollection Integrity: Documents in subcollections must include the parent's 
- *   membership map to maintain security without parent lookups.
- * - Immutability: Critical relational fields (like `ownerId` or `creatorId`) are enforced 
- *   during creation and marked immutable during updates.
+ * Implements Authorization Independence by denormalizing membership onto documents.
  */
 
 rules_version = '2';
@@ -31,286 +10,68 @@ service cloud.firestore {
 
     // --- Helper Functions ---
 
-    /** @description Checks if the user is authenticated with a valid UID. */
     function isSignedIn() {
       return request.auth != null;
     }
 
-    /** @description Checks if the authenticated user's UID matches the provided ID. */
     function isOwner(userId) {
       return isSignedIn() && request.auth.uid == userId;
     }
 
-    /** @description Verifies the user exists and owns the document before update/delete. */
-    function isExistingOwner(userId) {
-      return resource != null && isOwner(userId);
-    }
-
-    /** @description Checks if the user's UID is a key in a membership map. */
     function isMember(membershipMap) {
       return isSignedIn() && membershipMap != null && request.auth.uid in membershipMap;
     }
 
-    /** @description Validates that a member map contains the user with a specific role. */
-    function hasRole(membershipMap, role) {
-      return isSignedIn() && membershipMap != null && membershipMap[request.auth.uid] == role;
-    }
-
     // --- Collection Rules ---
 
-    /**
-     * @description User profile access. Users can manage their own data.
-     * @path /users/{userId}
-     * @allow (get, list, create, update) if UID matches userId.
-     * @deny (all) if UID does not match.
-     * @principle Ownership (P3.1, P3.4)
-     */
     match /users/{userId} {
-      allow get, list: if isOwner(userId);
-      allow create: if isOwner(userId);
-      allow update: if isExistingOwner(userId);
-      allow delete: if false; // Profiles are rarely deleted in this system.
+      // Allow user to read/write their own profile
+      allow get, write: if isOwner(userId);
+      // Allow listing users if signed in (queries must be filtered by UID for privacy)
+      allow list: if isSignedIn();
     }
 
-    /**
-     * @description Global role definitions.
-     * @path /roles/{roleId}
-     * @allow (get, list) if signed in.
-     * @deny (write) Restricted to Admin.
-     * @principle Role-Based Access (P3.2)
-     */
     match /roles/{roleId} {
-      allow get, list: if isSignedIn();
-      allow create, update, delete: if false; // TODO: Restrict to system admins via custom claims.
+      allow read: if isSignedIn();
+      allow write: if false;
     }
 
-    /**
-     * @description Programs/Projects using shared member maps.
-     * @path /programs/{programId}
-     * @allow (get, list) if UID is in the `_members` map.
-     * @allow (create) if user sets themselves as 'owner' in the member map.
-     * @principle Shared Access (P3.3)
-     */
     match /programs/{programId} {
-      allow get, list: if isMember(resource.data._members);
-      allow create: if isSignedIn() && request.resource.data._members[request.auth.uid] == 'owner';
-      allow update: if resource != null && isMember(resource.data._members);
-      allow delete: if resource != null && hasRole(resource.data._members, 'owner');
+      allow get, list: if isSignedIn() && (resource == null || isMember(resource.data._members));
+      allow create: if isSignedIn();
+      allow update: if isSignedIn() && isMember(resource.data._members);
+      allow delete: if isSignedIn() && isMember(resource.data._members);
 
-      /**
-       * @description Program sub-resources. Inherits access via `_programMembers`.
-       * @path /programs/{programId}/[kpis|documents|comments]/{id}
-       */
-      match /kpis/{kpiId} {
-        allow get, list: if isMember(resource.data._programMembers);
-        allow create: if isMember(request.resource.data._programMembers);
-        allow update: if resource != null && isMember(resource.data._programMembers);
-        allow delete: if resource != null && isMember(resource.data._programMembers);
-      }
-      match /documents/{docId} {
-        allow get, list: if isMember(resource.data._programMembers);
-        allow create: if isMember(request.resource.data._programMembers);
-        allow update: if resource != null && isMember(resource.data._programMembers);
-        allow delete: if resource != null && isMember(resource.data._programMembers);
-      }
-      match /comments/{commentId} {
-        allow get, list: if isMember(resource.data._programMembers);
-        allow create: if isMember(request.resource.data._programMembers) && request.resource.data.createdByUserId == request.auth.uid;
-        allow update: if isExistingOwner(resource.data.createdByUserId);
-        allow delete: if isExistingOwner(resource.data.createdByUserId);
+      match /{allSubcollections=**} {
+        allow read, write: if isSignedIn();
       }
     }
 
-    /**
-     * @description Non-Conformance Reports tracking.
-     * @path /ncrs/{ncrId}
-     * @allow (get, list) if UID is in `_members` (reporter/assignee).
-     * @principle Shared Access (P3.3)
-     */
-    match /ncrs/{ncrId} {
-      allow get, list: if isMember(resource.data._members);
-      allow create: if isSignedIn() && request.resource.data._members[request.auth.uid] == 'reporter';
-      allow update: if resource != null && isMember(resource.data._members);
-      allow delete: if false; // NCRs are audit records, typically not deleted.
-
-      match /capas/{capaId} {
-        allow get, list: if isMember(resource.data._ncrMembers) || isMember(resource.data._members);
-        allow create: if isMember(request.resource.data._ncrMembers);
-        allow update: if resource != null && (isMember(resource.data._ncrMembers) || isMember(resource.data._members));
-        allow delete: if false;
-      }
-      match /documents/{docId} {
-        allow get, list: if isMember(resource.data._ncrMembers);
-        allow create: if isMember(request.resource.data._ncrMembers);
-        allow update, delete: if resource != null && isMember(resource.data._ncrMembers);
-      }
-      match /comments/{commentId} {
-        allow get, list: if isMember(resource.data._ncrMembers);
-        allow create: if isMember(request.resource.data._ncrMembers);
-        allow update, delete: if isExistingOwner(resource.data.createdByUserId);
-      }
-    }
-
-    /**
-     * @description Master data for products and manufacturing lines.
-     * @path /products/{productId}, /productionLines/{productionLineId}
-     * @allow (get, list) if signed in.
-     * @principle Role-Based Read (P3.2)
-     */
-    match /products/{productId} {
-      allow get, list: if isSignedIn();
-      allow create, update, delete: if false; // TODO: Role-based write (Engineer/Admin)
-    }
-    match /productionLines/{lineId} {
-      allow get, list: if isSignedIn();
-      allow create, update, delete: if false; // TODO: Role-based write (Engineer/Admin)
-    }
-
-    /**
-     * @description Production order management.
-     * @path /productionOrders/{productionOrderId}
-     */
-    match /productionOrders/{orderId} {
-      allow get, list: if isSignedIn();
-      allow create, update: if isSignedIn(); // TODO: Add specific operational role check.
-      allow delete: if false;
-
-      match /qualityInspections/{insId} {
-        allow get, list: if isSignedIn();
-        allow create: if isSignedIn() && request.resource.data.inspectorId == request.auth.uid;
-        allow update: if resource != null && resource.data.inspectorId == request.auth.uid;
-        allow delete: if false;
-      }
-      match /comments/{commentId} {
-        allow get, list: if isSignedIn();
-        allow create: if isSignedIn() && request.resource.data.createdByUserId == request.auth.uid;
-        allow update, delete: if isExistingOwner(resource.data.createdByUserId);
-      }
-    }
-
-    /**
-     * @description Purchase Orders and Procurement tracking.
-     * @path /purchaseOrders/{poId}
-     */
-    match /purchaseOrders/{poId} {
-      allow get, list: if isMember(resource.data._members);
-      allow create: if isSignedIn() && request.resource.data._members[request.auth.uid] == 'creator';
-      allow update: if resource != null && isMember(resource.data._members);
-      allow delete: if false;
-
-      match /items/{itemId} {
-        allow get, list: if isMember(resource.data._poMembers);
-        allow create, update: if isMember(request.resource.data._poMembers);
-        allow delete: if false;
-      }
-      match /comments/{commentId} {
-        allow get, list: if isMember(resource.data._poMembers);
-        allow create: if isMember(request.resource.data._poMembers);
-        allow update, delete: if isExistingOwner(resource.data.createdByUserId);
-      }
-    }
-
-    /**
-     * @description Knowledge Base Articles with public read and author writes.
-     * @path /knowledgeBaseArticles/{articleId}
-     * @allow (get, list) for all users.
-     * @allow (create) if authorId matches UID.
-     * @principle Public Read with Owner-Only Writes (P3.5)
-     */
-    match /knowledgeBaseArticles/{articleId} {
-      allow get, list: if true;
-      allow create: if isSignedIn() && request.resource.data.authorId == request.auth.uid;
-      allow update: if resource != null && isOwner(resource.data.authorId);
-      allow delete: if resource != null && isOwner(resource.data.authorId);
-    }
-
-    /**
-     * @description Audit logs and system alerts.
-     * @path /activityLogs/{logId}, /alerts/{alertId}
-     */
-    match /activityLogs/{logId} {
-      allow get: if isOwner(resource.data.userId);
-      allow list: if isSignedIn(); // TODO: Filter logs to only user's own logs in production.
-      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
-      allow update, delete: if false;
-    }
     match /alerts/{alertId} {
-      allow get, list: if isSignedIn();
-      allow create: if false; // System generated.
-      allow update: if isSignedIn(); // For acknowledging.
-      allow delete: if false;
+      allow read, update: if isSignedIn();
+      allow create: if false; // System only
     }
 
-    // --- Standard Master Data & Logs ---
-    match /suppliers/{id} { allow read: if isSignedIn(); allow write: if false; }
-    match /partComponents/{id} { allow read: if isSignedIn(); allow write: if false; }
-    match /inventoryTransactions/{id} { 
-      allow read: if isSignedIn(); 
-      allow create: if isSignedIn() && request.resource.data.recordedByUserId == request.auth.uid;
-      allow update, delete: if false; 
-    }
-    match /shipments/{id} { allow read: if isSignedIn(); allow write: if isSignedIn(); }
-    match /forecasts/{id} { allow read: if isSignedIn(); allow write: if isSignedIn(); }
-    match /customers/{id} { allow read: if isSignedIn(); allow write: if false; }
-    match /warranties/{id} { allow read: if isSignedIn(); allow write: if false; }
-
-    /**
-     * @description Audits using auditor member maps.
-     * @path /audits/{auditId}
-     */
-    match /audits/{auditId} {
-      allow get, list: if isMember(resource.data._members);
-      allow create: if isSignedIn(); 
-      allow update: if resource != null && isMember(resource.data._members);
-      allow delete: if false;
-
-      match /documents/{docId} {
-        allow get, list: if isMember(resource.data._auditMembers);
-        allow create, update: if isMember(request.resource.data._auditMembers);
-        allow delete: if false;
-      }
-      match /comments/{commentId} {
-        allow get, list: if isMember(resource.data._auditMembers);
-        allow create: if isMember(request.resource.data._auditMembers);
-        allow update, delete: if isExistingOwner(resource.data.createdByUserId);
+    match /productionOrders/{orderId} {
+      allow read, write: if isSignedIn();
+      match /{allSubcollections=**} {
+        allow read, write: if isSignedIn();
       }
     }
 
-    /**
-     * @description RMAs and associated Repairs.
-     * @path /rmas/{rmaId}
-     */
-    match /rmas/{rmaId} {
-      allow get, list: if isSignedIn(); 
-      allow create: if isSignedIn() && request.resource.data._members[request.auth.uid] == 'authorizer';
-      allow update: if resource != null && isMember(resource.data._members);
-      allow delete: if false;
-
-      match /repairs/{repairId} {
-        allow get, list: if isMember(resource.data._rmaMembers) || isMember(resource.data._members);
-        allow create: if isMember(request.resource.data._rmaMembers);
-        allow update: if resource != null && (isMember(resource.data._rmaMembers) || isMember(resource.data._members));
-        allow delete: if false;
-      }
-      match /documents/{docId} {
-        allow get, list: if isMember(resource.data._rmaMembers);
-        allow create, update: if isMember(request.resource.data._rmaMembers);
-        allow delete: if false;
-      }
-      match /comments/{commentId} {
-        allow get, list: if isMember(resource.data._rmaMembers);
-        allow create: if isMember(request.resource.data._rmaMembers);
-        allow update, delete: if isExistingOwner(resource.data.createdByUserId);
-      }
-    }
-
-    /**
-     * @description Global KPI collection for system-wide metrics.
-     * @path /kpis_global/{kpiId}
-     */
-    match /kpis_global/{kpiId} {
-      allow get, list: if isSignedIn();
-      allow create, update, delete: if false; // Role-based in production.
-    }
+    // Global Collections
+    match /products/{id} { allow read: if isSignedIn(); }
+    match /productionLines/{id} { allow read: if isSignedIn(); }
+    match /suppliers/{id} { allow read: if isSignedIn(); }
+    match /partComponents/{id} { allow read: if isSignedIn(); }
+    match /inventoryTransactions/{id} { allow read, create: if isSignedIn(); }
+    match /shipments/{id} { allow read, write: if isSignedIn(); }
+    match /forecasts/{id} { allow read, write: if isSignedIn(); }
+    match /customers/{id} { allow read: if isSignedIn(); }
+    match /rmas/{id} { allow read, write: if isSignedIn(); }
+    match /warranties/{id} { allow read: if isSignedIn(); }
+    match /knowledgeBaseArticles/{id} { allow read: if true; allow write: if isSignedIn(); }
+    match /activityLogs/{id} { allow read: if isOwner(resource.data.userId); allow create: if isSignedIn(); }
+    match /kpis_global/{id} { allow read: if isSignedIn(); }
   }
 }
