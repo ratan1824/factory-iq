@@ -9,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { Wrench, RefreshCw, HeartPulse, History, Search, Download, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
+import { cn, exportToCSV } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 
 export default function AfterSalesPage() {
@@ -24,6 +24,9 @@ export default function AfterSalesPage() {
     });
 
     setTimeout(() => {
+      // Real CSV Export
+      exportToCSV(AFTER_SALES_RMAS, "FactoryIQ_RMA_History");
+      
       setIsExporting(false);
       toast({
         title: "Download Complete",
@@ -41,7 +44,7 @@ export default function AfterSalesPage() {
         </div>
         <Button 
           variant="outline" 
-          className="glass-card border-white/10 text-xs font-black uppercase tracking-widest h-11"
+          className="glass-card border-white/10 text-xs font-black uppercase tracking-widest h-11 px-8 rounded-xl shadow-xl shadow-primary/5"
           onClick={handleExport}
           disabled={isExporting}
         >
@@ -51,7 +54,7 @@ export default function AfterSalesPage() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-4">
-        <Card className="glass-card border-none bg-white/[0.03]">
+        <Card className="glass-card border-none bg-white/[0.03] rounded-3xl">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Active RMAs</CardTitle>
             <RefreshCw className="h-4 w-4 text-primary" />
@@ -61,7 +64,7 @@ export default function AfterSalesPage() {
             <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider mt-1">12 pending inspection</p>
           </CardContent>
         </Card>
-        <Card className="glass-card border-none bg-white/[0.03]">
+        <Card className="glass-card border-none bg-white/[0.03] rounded-3xl">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Repair Efficiency</CardTitle>
             <Wrench className="h-4 w-4 text-primary" />
@@ -71,7 +74,7 @@ export default function AfterSalesPage() {
             <p className="text-[10px] text-emerald-500 font-bold uppercase tracking-wider mt-1">-0.8 days vs avg</p>
           </CardContent>
         </Card>
-        <Card className="glass-card border-none bg-white/[0.03]">
+        <Card className="glass-card border-none bg-white/[0.03] rounded-3xl">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Warranty Claims</CardTitle>
             <HeartPulse className="h-4 w-4 text-primary" />
@@ -81,7 +84,7 @@ export default function AfterSalesPage() {
             <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider mt-1">Projected liability</p>
           </CardContent>
         </Card>
-        <Card className="glass-card border-none bg-white/[0.03]">
+        <Card className="glass-card border-none bg-white/[0.03] rounded-3xl">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Critical Spares</CardTitle>
             <History className="h-4 w-4 text-primary" />
@@ -100,7 +103,7 @@ export default function AfterSalesPage() {
         </div>
       </div>
 
-      <Card className="glass-card border-none overflow-hidden rounded-3xl">
+      <Card className="glass-card border-none overflow-hidden rounded-3xl bg-white/[0.01]">
         <CardHeader className="bg-white/5">
           <CardTitle className="text-lg font-black uppercase tracking-widest text-slate-300">Analysis Queue</CardTitle>
           <CardDescription className="text-xs font-medium">Ongoing return merchandise authorizations and repair tracking.</CardDescription>
@@ -134,7 +137,7 @@ export default function AfterSalesPage() {
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right pr-8">
-                    <Button variant="ghost" size="sm" className="rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-primary hover:text-white transition-all">Manage</Button>
+                    <Button variant="ghost" size="sm" className="rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-primary hover:text-white transition-all h-9 px-6">Manage</Button>
                   </TableCell>
                 </TableRow>
               ))}
