@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useMemo } from "react";
@@ -97,17 +98,17 @@ export default function ProgramsPage() {
     <div className="space-y-8 animate-in slide-in-from-bottom-2 duration-500">
       <div className="flex items-end justify-between">
         <div>
-          <h1 className="text-5xl font-black tracking-tighter text-white py-1">Program Portfolio</h1>
+          <h1 className="page-heading">Program Portfolio</h1>
           <p className="text-muted-foreground mt-1 text-sm font-medium">Global engineering lifecycle and NPI milestone visibility.</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" className="glass-card border-white/10 hover:bg-white/5 text-xs font-bold uppercase tracking-widest h-10 px-6">
+          <Button variant="outline" size="sm" className="glass-card border-white/10 hover:bg-white/5 text-xs font-bold uppercase tracking-widest h-11 px-6 rounded-xl">
             <Filter className="mr-2 h-4 w-4" /> Filter
           </Button>
           <Button 
             variant="outline" 
             size="sm" 
-            className="glass-card border-white/10 hover:bg-white/5 text-xs font-bold uppercase tracking-widest h-10 px-6"
+            className="glass-card border-white/10 hover:bg-white/5 text-xs font-bold uppercase tracking-widest h-11 px-6 rounded-xl"
             onClick={handleExport}
             disabled={isExporting}
           >
@@ -117,7 +118,7 @@ export default function ProgramsPage() {
         </div>
       </div>
 
-      <div className="flex items-center gap-4 glass-card p-4 rounded-2xl border-white/10">
+      <div className="flex items-center gap-4 glass-card p-4 rounded-3xl border-white/10">
         <div className="relative flex-1">
           <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
           <Input 

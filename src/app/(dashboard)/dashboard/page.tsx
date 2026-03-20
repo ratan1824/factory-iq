@@ -46,7 +46,7 @@ export default function DashboardPage() {
         <h1 className="page-heading">
           {isOwner ? "Manufacturing Overview" : "My Operations Hub"}
         </h1>
-        <p className="text-muted-foreground mt-1 text-sm">
+        <p className="text-muted-foreground mt-1 text-sm font-medium">
           {isOwner 
             ? "Real-time telemetry and excellence metrics across all sites." 
             : "Tracking personal production output and project tracks."}
@@ -56,9 +56,9 @@ export default function DashboardPage() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {isOwner ? (
           DASHBOARD_STATS.map((stat) => (
-            <Card key={stat.label} className="glass-card border-none">
+            <Card key={stat.label} className="glass-card border-none bg-white/[0.03] rounded-3xl">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">{stat.label}</CardTitle>
+                <CardTitle className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">{stat.label}</CardTitle>
                 {stat.change.startsWith('+') ? (
                   <ArrowUpRight className="h-4 w-4 text-emerald-500" />
                 ) : (
@@ -66,9 +66,9 @@ export default function DashboardPage() {
                 )}
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{stat.value}</div>
+                <div className="text-2xl font-black text-white">{stat.value}</div>
                 <p className={cn(
-                  "text-xs font-medium",
+                  "text-[10px] font-bold uppercase tracking-wider mt-1",
                   stat.change.startsWith('+') ? "text-emerald-500" : "text-rose-500"
                 )}>
                   {stat.change} <span className="text-muted-foreground">from last month</span>
@@ -78,14 +78,14 @@ export default function DashboardPage() {
           ))
         ) : (
           userStats.map((stat) => (
-            <Card key={stat.label} className="glass-card border-none">
+            <Card key={stat.label} className="glass-card border-none bg-white/[0.03] rounded-3xl">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">{stat.label}</CardTitle>
+                <CardTitle className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">{stat.label}</CardTitle>
                 <stat.icon className="h-4 w-4 text-primary" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{stat.value}</div>
-                <p className="text-xs font-medium text-emerald-500">
+                <div className="text-2xl font-black text-white">{stat.value}</div>
+                <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-500 mt-1">
                   {stat.change} <span className="text-muted-foreground">vs average</span>
                 </p>
               </CardContent>
@@ -95,10 +95,10 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="lg:col-span-4 glass-card border-none">
+        <Card className="lg:col-span-4 glass-card border-none rounded-3xl bg-white/[0.01]">
           <CardHeader>
-            <CardTitle>{isOwner ? "Global Production Yield" : "My Production Tracking"}</CardTitle>
-            <CardDescription>
+            <CardTitle className="text-lg font-black uppercase tracking-widest text-slate-300">{isOwner ? "Global Production Yield" : "My Production Tracking"}</CardTitle>
+            <CardDescription className="text-xs font-medium">
               {isOwner 
                 ? "Actual output vs plan across all active assembly lines." 
                 : "Your individual output performance for the current shift."}
@@ -123,10 +123,10 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="lg:col-span-3 glass-card border-none">
+        <Card className="lg:col-span-3 glass-card border-none rounded-3xl bg-white/[0.01]">
           <CardHeader>
-            <CardTitle>{isOwner ? "Critical Alerts" : "My Task Alerts"}</CardTitle>
-            <CardDescription>Issues requiring your immediate attention.</CardDescription>
+            <CardTitle className="text-lg font-black uppercase tracking-widest text-slate-300">{isOwner ? "Critical Alerts" : "My Task Alerts"}</CardTitle>
+            <CardDescription className="text-xs font-medium">Issues requiring your immediate attention.</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -142,8 +142,8 @@ export default function DashboardPage() {
                   </div>
                   <div className="flex-1 space-y-1">
                     <div className="flex items-center justify-between">
-                      <p className="text-sm font-semibold leading-none">{alert.title || alert.message}</p>
-                      <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">{alert.time || 'Live'}</span>
+                      <p className="text-sm font-bold leading-none">{alert.title || alert.message}</p>
+                      <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-black">{alert.time || 'Live'}</span>
                     </div>
                     <p className="text-xs text-muted-foreground line-clamp-2">{alert.description || alert.type}</p>
                   </div>

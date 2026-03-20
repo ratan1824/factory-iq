@@ -59,15 +59,14 @@ export default function AnalyticsPage() {
     <div className="space-y-8 animate-in slide-in-from-bottom-2 duration-500">
       <div className="flex items-end justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-white">Analytics Workbench</h1>
-          <p className="text-muted-foreground">Deep-dive into manufacturing metrics and custom reporting.</p>
+          <h1 className="page-heading">Analytics Workbench</h1>
+          <p className="text-muted-foreground mt-1 text-sm font-medium">Deep-dive into manufacturing metrics and custom reporting.</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" className="glass-card border-white/10 text-xs font-bold uppercase tracking-widest"><Calendar className="mr-2 h-4 w-4" /> Last 30 Days</Button>
-          <Button variant="outline" size="sm" className="glass-card border-white/10 text-xs font-bold uppercase tracking-widest"><Filter className="mr-2 h-4 w-4" /> Advanced</Button>
-          <Button variant="outline" size="sm" className="glass-card border-white/10 text-xs font-bold uppercase tracking-widest"><Share2 className="mr-2 h-4 w-4" /> Share</Button>
+          <Button variant="outline" size="sm" className="glass-card border-white/10 text-xs font-black uppercase tracking-widest h-11 px-6 rounded-xl"><Calendar className="mr-2 h-4 w-4" /> Period</Button>
+          <Button variant="outline" size="sm" className="glass-card border-white/10 text-xs font-black uppercase tracking-widest h-11 px-6 rounded-xl"><Filter className="mr-2 h-4 w-4" /> Filters</Button>
           <Button 
-            className="bg-primary text-white font-black text-xs uppercase tracking-widest px-6 h-10 rounded-xl shadow-lg shadow-primary/20"
+            className="bg-primary text-white font-black text-xs uppercase tracking-widest px-8 h-11 rounded-xl shadow-lg shadow-primary/20 hover:bg-accent transition-all"
             onClick={handleExport}
             disabled={isExporting}
           >
@@ -80,8 +79,8 @@ export default function AnalyticsPage() {
       <div className="grid gap-6 lg:grid-cols-2">
         <Card className="glass-card border-none rounded-3xl overflow-hidden shadow-2xl bg-white/[0.01]">
           <CardHeader>
-            <CardTitle className="text-lg font-black uppercase tracking-widest text-slate-300">Historical Efficiency Trends</CardTitle>
-            <CardDescription className="text-xs">Multi-metric comparison across historical production cycles.</CardDescription>
+            <CardTitle className="text-lg font-black uppercase tracking-widest text-slate-300">Efficiency Trends</CardTitle>
+            <CardDescription className="text-xs font-medium">Multi-metric comparison across historical production cycles.</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="h-[350px]">
@@ -106,7 +105,7 @@ export default function AnalyticsPage() {
         <Card className="glass-card border-none rounded-3xl overflow-hidden shadow-2xl bg-white/[0.01]">
           <CardHeader>
             <CardTitle className="text-lg font-black uppercase tracking-widest text-slate-300">Fulfillment Distribution</CardTitle>
-            <CardDescription className="text-xs">Breakdown of delivery performance across all active regions.</CardDescription>
+            <CardDescription className="text-xs font-medium">Breakdown of delivery performance across regions.</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="h-[350px] flex items-center justify-center">
@@ -138,32 +137,32 @@ export default function AnalyticsPage() {
 
       <Card className="glass-card border-none rounded-3xl shadow-2xl bg-white/[0.01]">
         <CardHeader>
-          <CardTitle className="text-lg font-black uppercase tracking-widest text-slate-300">Data Export Configuration</CardTitle>
-          <CardDescription className="text-xs">Schedule automated reports to your inbox or cloud storage.</CardDescription>
+          <CardTitle className="text-lg font-black uppercase tracking-widest text-slate-300">Configuration</CardTitle>
+          <CardDescription className="text-xs font-medium">Schedule automated reports to your inbox or cloud storage.</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="space-y-4">
-              <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Standard Reports</h4>
+              <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Standards</h4>
               <div className="space-y-2">
-                 <Button variant="ghost" className="w-full justify-start text-[10px] font-bold uppercase tracking-widest hover:bg-white/5 h-10 rounded-xl">Monthly Production Yield</Button>
-                 <Button variant="ghost" className="w-full justify-start text-[10px] font-bold uppercase tracking-widest hover:bg-white/5 h-10 rounded-xl">Quarterly Quality Audit</Button>
-                 <Button variant="ghost" className="w-full justify-start text-[10px] font-bold uppercase tracking-widest hover:bg-white/5 h-10 rounded-xl">Vendor Scorecard 2023</Button>
+                 <Button variant="ghost" className="w-full justify-start text-[10px] font-black uppercase tracking-widest hover:bg-white/5 h-11 rounded-xl px-4">Production Yield</Button>
+                 <Button variant="ghost" className="w-full justify-start text-[10px] font-black uppercase tracking-widest hover:bg-white/5 h-11 rounded-xl px-4">Quality Audit</Button>
+                 <Button variant="ghost" className="w-full justify-start text-[10px] font-black uppercase tracking-widest hover:bg-white/5 h-11 rounded-xl px-4">Vendor Scorecard</Button>
               </div>
             </div>
             <div className="space-y-4">
-              <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Export Formats</h4>
+              <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Formats</h4>
               <div className="grid grid-cols-2 gap-2">
-                 <Button variant="outline" className="border-white/10 rounded-xl font-bold text-[10px] h-10">CSV</Button>
-                 <Button variant="outline" className="border-white/10 rounded-xl font-bold text-[10px] h-10">Excel</Button>
-                 <Button variant="outline" className="border-white/10 rounded-xl font-bold text-[10px] h-10">PDF</Button>
-                 <Button variant="outline" className="border-white/10 rounded-xl font-bold text-[10px] h-10">JSON</Button>
+                 <Button variant="outline" className="border-white/10 rounded-xl font-black text-[10px] uppercase tracking-widest h-11">CSV</Button>
+                 <Button variant="outline" className="border-white/10 rounded-xl font-black text-[10px] uppercase tracking-widest h-11">Excel</Button>
+                 <Button variant="outline" className="border-white/10 rounded-xl font-black text-[10px] uppercase tracking-widest h-11">PDF</Button>
+                 <Button variant="outline" className="border-white/10 rounded-xl font-black text-[10px] uppercase tracking-widest h-11">JSON</Button>
               </div>
             </div>
             <div className="space-y-4">
-              <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Scheduling</h4>
-              <p className="text-xs text-muted-foreground font-medium">Next scheduled export: <span className="font-black text-white">Monday, 08:00 AM</span></p>
-              <Button className="w-full rounded-xl bg-primary text-xs font-black uppercase tracking-widest h-11">Configure Automation</Button>
+              <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Scheduling</h4>
+              <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider">Next Sync: <span className="text-white">Monday, 08:00 AM</span></p>
+              <Button className="w-full rounded-xl bg-primary text-[10px] font-black uppercase tracking-widest h-12 shadow-xl shadow-primary/10">Configure Automation</Button>
             </div>
           </div>
         </CardContent>
