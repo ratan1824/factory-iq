@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useMemo } from "react";
@@ -12,12 +13,13 @@ import {
   Tooltip, 
   ResponsiveContainer 
 } from "recharts";
-import { AlertCircle, ArrowUpRight, ArrowDownRight, Info, AlertTriangle } from "lucide-react";
+import { AlertCircle, ArrowUpRight, ArrowDownRight, Info, AlertTriangle, TrendingUp, Package, DollarSign } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useCollection, useMemoFirebase, useFirestore } from "@/firebase";
+import { useCollection, useMemoFirebase, useFirestore, useUser } from "@/firebase";
 import { collection, query, limit, orderBy } from "firebase/firestore";
 
 export default function DashboardPage() {
+  const { profile } = useUser();
   const firestore = useFirestore();
   const alertsQuery = useMemoFirebase(
     () => query(collection(firestore, "alerts"), orderBy("timestamp", "desc"), limit(5)),
@@ -29,42 +31,78 @@ export default function DashboardPage() {
     return firestoreAlerts && firestoreAlerts.length > 0 ? firestoreAlerts : MOCK_ALERTS;
   }, [firestoreAlerts]);
 
+  const isOwner = profile?.role === 'owner';
+
+  // Personal metrics for 'user' role
+  const userStats = [
+    { label: 'My Output Today', value: '342 Units', change: '+12%', icon: Package },
+    { label: 'Project Sales', value: '$12,400', change: '+8%', icon: DollarSign },
+    { label: 'Fulfillment Rate', value: '94%', change: '+2%', icon: TrendingUp },
+  ];
+
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
       <div>
-        <h1 className="page-heading">Manufacturing Overview</h1>
-        <p className="text-muted-foreground mt-1 text-sm">Real-time telemetry and excellence metrics across all sites.</p>
+        <h1 className="page-heading">
+          {isOwner ? "Manufacturing Overview" : "My Operations Hub"}
+        </h1>
+        <p className="text-muted-foreground mt-1 text-sm">
+          {isOwner 
+            ? "Real-time telemetry and excellence metrics across all sites." 
+            : "Tracking personal production output and project tracks."}
+        </p>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {DASHBOARD_STATS.map((stat) => (
-          <Card key={stat.label} className="glass-card border-none">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">{stat.label}</CardTitle>
-              {stat.change.startsWith('+') ? (
-                <ArrowUpRight className="h-4 w-4 text-emerald-500" />
-              ) : (
-                <ArrowDownRight className="h-4 w-4 text-rose-500" />
-              )}
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stat.value}</div>
-              <p className={cn(
-                "text-xs font-medium",
-                stat.change.startsWith('+') ? "text-emerald-500" : "text-rose-500"
-              )}>
-                {stat.change} <span className="text-muted-foreground">from last month</span>
-              </p>
-            </CardContent>
-          </Card>
-        ))}
+        {isOwner ? (
+          DASHBOARD_STATS.map((stat) => (
+            <Card key={stat.label} className="glass-card border-none">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">{stat.label}</CardTitle>
+                {stat.change.startsWith('+') ? (
+                  <ArrowUpRight className="h-4 w-4 text-emerald-500" />
+                ) : (
+                  <ArrowDownRight className="h-4 w-4 text-rose-500" />
+                )}
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{stat.value}</div>
+                <p className={cn(
+                  "text-xs font-medium",
+                  stat.change.startsWith('+') ? "text-emerald-500" : "text-rose-500"
+                )}>
+                  {stat.change} <span className="text-muted-foreground">from last month</span>
+                </p>
+              </CardContent>
+            </Card>
+          ))
+        ) : (
+          userStats.map((stat) => (
+            <Card key={stat.label} className="glass-card border-none">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">{stat.label}</CardTitle>
+                <stat.icon className="h-4 w-4 text-primary" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{stat.value}</div>
+                <p className="text-xs font-medium text-emerald-500">
+                  {stat.change} <span className="text-muted-foreground">vs average</span>
+                </p>
+              </CardContent>
+            </Card>
+          ))
+        )}
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
         <Card className="lg:col-span-4 glass-card border-none">
           <CardHeader>
-            <CardTitle>Production Output vs Plan</CardTitle>
-            <CardDescription>Daily manufacturing yield across active assembly lines.</CardDescription>
+            <CardTitle>{isOwner ? "Global Production Yield" : "My Production Tracking"}</CardTitle>
+            <CardDescription>
+              {isOwner 
+                ? "Actual output vs plan across all active assembly lines." 
+                : "Your individual output performance for the current shift."}
+            </CardDescription>
           </CardHeader>
           <CardContent className="pl-2">
             <div className="h-[300px]">
@@ -77,8 +115,8 @@ export default function DashboardPage() {
                     cursor={{fill: 'rgba(255,255,255,0.05)'}}
                     contentStyle={{ backgroundColor: '#020617', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }}
                   />
-                  <Bar dataKey="output" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} name="Actual Output" />
-                  <Bar dataKey="plan" fill="hsl(var(--accent))" radius={[4, 4, 0, 0]} name="Planned Output" />
+                  <Bar dataKey="output" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} name="My Output" />
+                  {isOwner && <Bar dataKey="plan" fill="hsl(var(--accent))" radius={[4, 4, 0, 0]} name="Site Plan" />}
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -87,8 +125,8 @@ export default function DashboardPage() {
 
         <Card className="lg:col-span-3 glass-card border-none">
           <CardHeader>
-            <CardTitle>Critical Alerts</CardTitle>
-            <CardDescription>Active issues requiring immediate attention.</CardDescription>
+            <CardTitle>{isOwner ? "Critical Alerts" : "My Task Alerts"}</CardTitle>
+            <CardDescription>Issues requiring your immediate attention.</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
