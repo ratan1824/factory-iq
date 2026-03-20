@@ -1,14 +1,15 @@
 
 "use client";
 
-import { useState } from "react";
-import { useAuth, useFirestore } from "@/firebase";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth, useFirestore, useUser } from "@/firebase";
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Factory, Loader2, User, Shield, AlertCircle } from "lucide-react";
+import { Factory, Loader2, Shield, AlertCircle, Key, Mail } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { doc, setDoc } from "firebase/firestore";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -16,12 +17,20 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 export default function LoginPage() {
   const auth = useAuth();
   const firestore = useFirestore();
+  const { user, isUserLoading } = useUser();
+  const router = useRouter();
   const { toast } = useToast();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  // Manual sign-in handler
+  // Redirect if already logged in
+  useEffect(() => {
+    if (!isUserLoading && user) {
+      router.push("/dashboard");
+    }
+  }, [user, isUserLoading, router]);
+
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) {
@@ -30,65 +39,43 @@ export default function LoginPage() {
     }
     setIsLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      toast({ title: "Welcome Back", description: "Access authorized successfully." });
+      // Prototype-friendly logic: attempt to sign in, if fails with user-not-found, create the user
+      // This ensures the predefined credentials work even if the Firebase project is fresh.
+      let userCredential;
+      try {
+        userCredential = await signInWithEmailAndPassword(auth, email, password);
+      } catch (error: any) {
+        if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
+          // Only auto-create for the predefined demo emails to keep things simple for the user
+          if (email === 'admin@factoryiq.com' || email === 'user@factoryiq.com') {
+            userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            // Initialize the profile
+            const role = email === 'admin@factoryiq.com' ? 'owner' : 'user';
+            const userRef = doc(firestore, 'users', userCredential.user.uid);
+            await setDoc(userRef, {
+              id: userCredential.user.uid,
+              role: role,
+              firstName: role === 'owner' ? 'Ratan' : 'Manufacturing',
+              lastName: role === 'owner' ? 'Kollabathula' : 'Engineer',
+              email: email,
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+            }, { merge: true });
+          } else {
+            throw error;
+          }
+        } else {
+          throw error;
+        }
+      }
+      
+      toast({ title: "Access Authorized", description: "Welcome to FactoryIQ Excellence Portal." });
+      router.push("/dashboard");
     } catch (error: any) {
       toast({
         variant: "destructive",
         title: "Authentication Failed",
-        description: error.message || "Invalid credentials. Please try again.",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  /**
-   * Prototype-friendly login: 
-   * Attempts to sign in with predefined credentials. 
-   * If the user doesn't exist, it creates them and initializes the profile.
-   */
-  const quickLogin = async (role: 'owner' | 'user') => {
-    setIsLoading(true);
-    const demoEmail = role === 'owner' ? 'admin@factoryiq.com' : 'user@factoryiq.com';
-    const demoPassword = 'factory123';
-
-    try {
-      let userCredential;
-      try {
-        // Attempt sign-in
-        userCredential = await signInWithEmailAndPassword(auth, demoEmail, demoPassword);
-      } catch (signInError: any) {
-        // If user doesn't exist, create them (only for this demo prototype)
-        if (signInError.code === 'auth/user-not-found' || signInError.code === 'auth/invalid-credential') {
-          userCredential = await createUserWithEmailAndPassword(auth, demoEmail, demoPassword);
-        } else {
-          throw signInError;
-        }
-      }
-
-      // Initialize/Update the user profile in Firestore
-      const userRef = doc(firestore, 'users', userCredential.user.uid);
-      await setDoc(userRef, {
-        id: userCredential.user.uid,
-        role: role,
-        firstName: role === 'owner' ? 'Ratan' : 'Manufacturing',
-        lastName: role === 'owner' ? 'Kollabathula' : 'Engineer',
-        email: demoEmail,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      }, { merge: true });
-
-      toast({
-        title: "Profile Synchronized",
-        description: `Logged in as ${role === 'owner' ? 'Admin' : 'User'}.`,
-      });
-    } catch (error: any) {
-      console.error(error);
-      toast({
-        variant: "destructive",
-        title: "Access Error",
-        description: "Make sure Email/Password is enabled in Firebase Console.",
+        description: error.message || "Invalid credentials. Please use the provided details below.",
       });
     } finally {
       setIsLoading(false);
@@ -121,7 +108,7 @@ export default function LoginPage() {
               <Input
                 id="email"
                 type="email"
-                placeholder="name@factoryiq.com"
+                placeholder="admin@factoryiq.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="bg-white/5 border-white/10 text-white placeholder:text-slate-600 h-12 rounded-xl focus:ring-primary/40 focus:border-primary/40 transition-all"
@@ -132,6 +119,7 @@ export default function LoginPage() {
               <Input
                 id="password"
                 type="password"
+                placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="bg-white/5 border-white/10 text-white h-12 rounded-xl focus:ring-primary/40 focus:border-primary/40 transition-all"
@@ -147,35 +135,46 @@ export default function LoginPage() {
               <span className="w-full border-t border-white/5" />
             </div>
             <div className="relative flex justify-center text-[10px] uppercase font-black tracking-[0.3em]">
-              <span className="bg-[#020617] px-4 text-slate-500">Instant Role Access</span>
+              <span className="bg-[#020617] px-4 text-slate-500">Access Directory</span>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <Button 
-              variant="outline" 
-              onClick={() => quickLogin('owner')} 
-              className="h-20 bg-white/[0.03] border-white/10 text-white hover:bg-primary/20 hover:border-primary/40 rounded-2xl group transition-all flex flex-col items-center justify-center gap-2"
-              disabled={isLoading}
-            >
-              <Shield className="h-5 w-5 text-primary group-hover:scale-110 transition-transform" />
-              <div className="text-center">
-                <p className="text-[10px] font-black uppercase tracking-widest leading-none">Admin</p>
-                <p className="text-[8px] text-slate-500 mt-1 lowercase font-mono">admin@factoryiq.com</p>
+          <div className="space-y-3">
+            <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/5 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Shield className="h-4 w-4 text-primary" />
+                  <span className="text-[10px] font-black uppercase tracking-widest">Admin Credentials</span>
+                </div>
+                <Badge variant="outline" className="text-[8px] uppercase tracking-tighter border-primary/30 text-primary">Full Access</Badge>
               </div>
-            </Button>
-            <Button 
-              variant="outline" 
-              onClick={() => quickLogin('user')} 
-              className="h-20 bg-white/[0.03] border-white/10 text-white hover:bg-accent/20 hover:border-accent/40 rounded-2xl group transition-all flex flex-col items-center justify-center gap-2"
-              disabled={isLoading}
-            >
-              <User className="h-5 w-5 text-accent group-hover:scale-110 transition-transform" />
-              <div className="text-center">
-                <p className="text-[10px] font-black uppercase tracking-widest leading-none">User</p>
-                <p className="text-[8px] text-slate-500 mt-1 lowercase font-mono">user@factoryiq.com</p>
+              <div className="grid grid-cols-2 gap-2 text-[10px] font-mono">
+                <div className="flex items-center gap-1.5 text-slate-400">
+                  <Mail className="h-3 w-3" /> admin@factoryiq.com
+                </div>
+                <div className="flex items-center gap-1.5 text-slate-400">
+                  <Key className="h-3 w-3" /> factory123
+                </div>
               </div>
-            </Button>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/5 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Factory className="h-4 w-4 text-accent" />
+                  <span className="text-[10px] font-black uppercase tracking-widest">User Credentials</span>
+                </div>
+                <Badge variant="outline" className="text-[8px] uppercase tracking-tighter border-accent/30 text-accent">Restricted</Badge>
+              </div>
+              <div className="grid grid-cols-2 gap-2 text-[10px] font-mono">
+                <div className="flex items-center gap-1.5 text-slate-400">
+                  <Mail className="h-3 w-3" /> user@factoryiq.com
+                </div>
+                <div className="flex items-center gap-1.5 text-slate-400">
+                  <Key className="h-3 w-3" /> factory123
+                </div>
+              </div>
+            </div>
           </div>
         </CardContent>
 
@@ -184,11 +183,19 @@ export default function LoginPage() {
             <AlertCircle className="h-4 w-4 text-primary" />
             <AlertTitle className="text-[10px] font-black uppercase tracking-widest text-primary">Predefined Access</AlertTitle>
             <AlertDescription className="text-[10px] text-slate-400 leading-relaxed mt-1">
-              Select a role above to instantly authorize access using the two predefined accounts.
+              Enter the credentials above to authorize your session and explore the specific role capabilities.
             </AlertDescription>
           </Alert>
         </CardFooter>
       </Card>
     </div>
   );
+}
+
+function Badge({ className, variant, children }: any) {
+  return (
+    <div className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${className}`}>
+      {children}
+    </div>
+  )
 }
