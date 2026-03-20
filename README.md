@@ -1,6 +1,6 @@
-# FactoryIQ – Manufacturing Excellence Portal
+# FactoryIQ – Cyber Emerald Edition
 
-A production-grade enterprise SaaS for manufacturing excellence, built with Next.js, Firebase, and GenAI.
+A production-grade enterprise SaaS for manufacturing excellence, now featuring the **Cyber Emerald & Obsidian** high-intelligence visual interface. Built with Next.js, Firebase, and GenAI.
 
 ## Getting Started
 
@@ -12,39 +12,25 @@ npm run dev
 
 Open [http://localhost:9002](http://localhost:9002) with your browser to see the result.
 
-## Pushing to GitHub
+## Pushing Updates to GitHub
 
-To push this project to your repository, run the following commands in your terminal. If you previously added an incorrect URL, start with the "Fixing a wrong URL" section.
+To update your repository with the latest Cyber Emerald theme and functional improvements, run:
 
-### Initial Setup
 ```bash
-# 1. Initialize git
-git init
-
-# 2. Add all files
+# Stage all new files and changes
 git add .
 
-# 3. Create initial commit
-git commit -m "feat: initial commit for FactoryIQ excellence portal"
+# Create a descriptive commit
+git commit -m "feat: Cyber Emerald theme, standardized headings, and functional CSV exports"
 
-# 4. Add your remote repository
-git remote add origin https://github.com/ratan1824/factory-iq.git
-
-# 5. Push to main
-git branch -M main
-git push -u origin main
+# Push to the main branch
+git push origin main
 ```
 
-### Fixing a "Repository Not Found" Error
-If you accidentally added the placeholder URL, run these:
-```bash
-git remote set-url origin https://github.com/ratan1824/factory-iq.git
-git push -u origin main
-```
+## Latest Features
 
-## Features
-
-- **Program Portfolio**: Comprehensive tracking of manufacturing projects.
-- **Production Telemetry**: Real-time monitoring of assembly lines and OEE.
-- **Quality & Compliance**: Digital NCR and CAPA management.
-- **GenAI Integration**: Intelligent analysis of manufacturing data (Genkit).
+- **Cyber Emerald UI**: A high-contrast, obsidian-based "Neural" interface designed for industrial intelligence.
+- **Unified Typography**: Standardized page headings and visual hierarchy across all modules.
+- **Functional CSV Exports**: Real-time data extraction to CSV for Programs, Quality, Supply Chain, and Analytics.
+- **Role-Based Workspaces**: Tailored experiences for Admin (Owner) and Engineer (User) nodes.
+- **Production Telemetry**: Visual monitoring of assembly lines and OEE (Cyber Emerald Charts).
