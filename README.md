@@ -14,8 +14,9 @@ Open [http://localhost:9002](http://localhost:9002) with your browser to see the
 
 ## Pushing to GitHub
 
-To push this project to your repository, run the following commands in your terminal:
+To push this project to your repository, run the following commands in your terminal. If you previously added an incorrect URL, start with the "Fixing a wrong URL" section.
 
+### Initial Setup
 ```bash
 # 1. Initialize git
 git init
@@ -31,6 +32,13 @@ git remote add origin https://github.com/ratan1824/factory-iq.git
 
 # 5. Push to main
 git branch -M main
+git push -u origin main
+```
+
+### Fixing a "Repository Not Found" Error
+If you accidentally added the placeholder URL, run these:
+```bash
+git remote set-url origin https://github.com/ratan1824/factory-iq.git
 git push -u origin main
 ```
 
