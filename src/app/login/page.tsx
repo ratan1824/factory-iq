@@ -39,12 +39,14 @@ export default function LoginPage() {
     setIsLoading(true);
     const email = role === 'owner' ? 'admin@factoryiq.com' : 'user@factoryiq.com';
     try {
+      // In a prototype, we assume these users exist. 
+      // User would need to create them in Firebase Console first.
       await initiateEmailSignIn(auth, email, 'factory123');
     } catch (error: any) {
       toast({
         variant: "destructive",
         title: "Quick Login Failed",
-        description: "Credentials not initialized. Please use the form.",
+        description: "Credentials not initialized in Firebase. Use standard login or create users in console.",
       });
     } finally {
       setIsLoading(false);
@@ -53,6 +55,7 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center p-4 bg-slate-950 overflow-hidden relative">
+      {/* Decorative background elements */}
       <div className="absolute top-0 -left-4 w-[500px] h-[500px] bg-primary/20 rounded-full mix-blend-screen filter blur-[120px] opacity-40 animate-pulse" />
       <div className="absolute bottom-0 -right-4 w-[500px] h-[500px] bg-accent/20 rounded-full mix-blend-screen filter blur-[120px] opacity-40 animate-pulse delay-700" />
       
@@ -104,7 +107,7 @@ export default function LoginPage() {
             <span className="w-full border-t border-white/5" />
           </div>
           <div className="relative flex justify-center text-[10px] uppercase font-black tracking-[0.2em]">
-            <span className="bg-[#020617] px-4 text-slate-500">Select Access Persona</span>
+            <span className="bg-[#020617] px-4 text-slate-500">Demo Mode</span>
           </div>
         </div>
 
@@ -118,7 +121,7 @@ export default function LoginPage() {
             >
               <div className="flex flex-col items-center gap-1">
                 <Shield className="h-4 w-4 text-primary group-hover:scale-110 transition-transform" />
-                <span className="text-[10px] font-bold uppercase">Owner (Full)</span>
+                <span className="text-[10px] font-bold uppercase">Owner</span>
               </div>
             </Button>
             <Button 
@@ -129,13 +132,13 @@ export default function LoginPage() {
             >
               <div className="flex flex-col items-center gap-1">
                 <User className="h-4 w-4 text-accent group-hover:scale-110 transition-transform" />
-                <span className="text-[10px] font-bold uppercase">User (Limited)</span>
+                <span className="text-[10px] font-bold uppercase">Engineer</span>
               </div>
             </Button>
           </div>
-          <div className="flex items-center justify-center gap-2 text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-2">
-            <ShieldCheck className="h-3 w-3 text-emerald-500" />
-            Multi-Role Encrypted Tunnel
+          <div className="bg-primary/10 rounded-lg p-3 w-full border border-primary/20">
+             <p className="text-[10px] font-bold text-primary-foreground uppercase text-center mb-1">Demo Credentials</p>
+             <p className="text-[10px] text-slate-400 text-center">User: admin@factoryiq.com | Pass: factory123</p>
           </div>
         </CardFooter>
       </Card>
