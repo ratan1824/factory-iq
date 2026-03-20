@@ -1,0 +1,2209 @@
+{
+  "entities": {
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents a user of the FactoryIQ application, linked to a specific role.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the User entity."
+        },
+        "firstName": {
+          "type": "string",
+          "description": "The first name of the user."
+        },
+        "lastName": {
+          "type": "string",
+          "description": "The last name of the user."
+        },
+        "email": {
+          "type": "string",
+          "description": "The email address of the user, used for communication.",
+          "format": "email"
+        },
+        "roleId": {
+          "type": "string",
+          "description": "Reference to the Role entity, defining the user's permissions. (Relationship: Role 1:N User)"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the user account was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp when the user account was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "firstName",
+        "lastName",
+        "email",
+        "roleId",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "Role": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Role",
+      "type": "object",
+      "description": "Defines user roles and associated permissions within the FactoryIQ application.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Role entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the role (e.g., 'Admin', 'Engineer', 'Customer')."
+        },
+        "description": {
+          "type": "string",
+          "description": "A brief description of the role's responsibilities and access."
+        },
+        "permissions": {
+          "type": "array",
+          "description": "A list of permission strings granted to this role (e.g., 'read:dashboard', 'write:program').",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "description",
+        "permissions"
+      ]
+    },
+    "Program": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Program",
+      "type": "object",
+      "description": "Represents a project, program, or initiative, tracking its status and lifecycle from R&D to Production.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Program entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the program."
+        },
+        "description": {
+          "type": "string",
+          "description": "A detailed description of the program's objectives and scope."
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of the program (e.g., 'Green', 'Yellow', 'Red', 'R&D', 'NPI', 'Production', 'Completed')."
+        },
+        "startDate": {
+          "type": "string",
+          "description": "The planned start date of the program.",
+          "format": "date-time"
+        },
+        "endDate": {
+          "type": "string",
+          "description": "The planned end date of the program.",
+          "format": "date-time"
+        },
+        "ownerId": {
+          "type": "string",
+          "description": "Reference to the User who owns or is responsible for the program. (Relationship: User 1:N Program)"
+        },
+        "teamMemberIds": {
+          "type": "array",
+          "description": "References to Users who are team members on this program. (Relationship: User N:N Program)",
+          "items": {
+            "type": "string"
+          }
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the program was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp when the program was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "description",
+        "status",
+        "startDate",
+        "ownerId",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "KeyPerformanceIndicator": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "KeyPerformanceIndicator",
+      "type": "object",
+      "description": "Stores historical data for various key performance indicators (KPIs) relevant to manufacturing operations.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the KeyPerformanceIndicator entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the KPI (e.g., 'Delivery On-Time Rate', 'First Pass Yield', 'Overall Equipment Effectiveness')."
+        },
+        "value": {
+          "type": "number",
+          "description": "The numerical value of the KPI at the recorded timestamp."
+        },
+        "unit": {
+          "type": "string",
+          "description": "The unit of measurement for the KPI value (e.g., '%', 'units/hr', 'score')."
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "The specific date and time when the KPI value was recorded.",
+          "format": "date-time"
+        },
+        "reportingPeriod": {
+          "type": "string",
+          "description": "The period over which the KPI was measured (e.g., 'Daily', 'Weekly', 'Monthly', 'Quarterly')."
+        },
+        "programId": {
+          "type": "string",
+          "description": "Optional reference to a Program if the KPI is specific to a particular program. (Relationship: Program 1:N KeyPerformanceIndicator)"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "value",
+        "unit",
+        "timestamp",
+        "reportingPeriod"
+      ]
+    },
+    "Alert": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Alert",
+      "type": "object",
+      "description": "Records alerts generated within the system, notifying users of critical events or deviations.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Alert entity."
+        },
+        "message": {
+          "type": "string",
+          "description": "The descriptive message of the alert."
+        },
+        "severity": {
+          "type": "string",
+          "description": "The level of urgency or impact of the alert (e.g., 'Low', 'Medium', 'High', 'Critical')."
+        },
+        "type": {
+          "type": "string",
+          "description": "The category or type of the alert (e.g., 'ProductionAnomaly', 'QualityIssue', 'SupplyDelay', 'MaintenanceRequired')."
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "The date and time when the alert was generated.",
+          "format": "date-time"
+        },
+        "isAcknowledged": {
+          "type": "boolean",
+          "description": "Indicates whether the alert has been acknowledged by a user."
+        },
+        "acknowledgedByUserId": {
+          "type": "string",
+          "description": "Reference to the User who acknowledged the alert. (Relationship: User 1:N Alert)"
+        },
+        "relatedEntityId": {
+          "type": "string",
+          "description": "Optional reference to the ID of the entity that triggered the alert (e.g., a ProductionOrder, NCR, or Equipment)."
+        },
+        "relatedEntityType": {
+          "type": "string",
+          "description": "The type of the entity related to this alert (e.g., 'ProductionOrder', 'NonConformanceReport')."
+        }
+      },
+      "required": [
+        "id",
+        "message",
+        "severity",
+        "type",
+        "timestamp",
+        "isAcknowledged"
+      ]
+    },
+    "Product": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Product",
+      "type": "object",
+      "description": "Defines a manufactured product, including its specifications and lifecycle stage.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Product entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The marketing or common name of the product."
+        },
+        "description": {
+          "type": "string",
+          "description": "A detailed description of the product and its features."
+        },
+        "productNumber": {
+          "type": "string",
+          "description": "The internal product number or SKU."
+        },
+        "version": {
+          "type": "string",
+          "description": "The current version of the product design or specification."
+        },
+        "currentLifecycleStage": {
+          "type": "string",
+          "description": "The current stage in the product's lifecycle (e.g., 'R&D', 'NPI', 'Production', 'End-of-Life')."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the product record was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp when the product record was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "productNumber",
+        "version",
+        "currentLifecycleStage",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "ProductionOrder": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "ProductionOrder",
+      "type": "object",
+      "description": "Tracks a specific manufacturing order, including planned quantity, actual output, and status.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the ProductionOrder entity."
+        },
+        "orderNumber": {
+          "type": "string",
+          "description": "The unique identifier for this production order."
+        },
+        "productId": {
+          "type": "string",
+          "description": "Reference to the Product being manufactured. (Relationship: Product 1:N ProductionOrder)"
+        },
+        "quantityPlanned": {
+          "type": "number",
+          "description": "The total quantity of products planned for this order."
+        },
+        "quantityProduced": {
+          "type": "number",
+          "description": "The actual quantity of products produced so far for this order."
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of the production order (e.g., 'Planned', 'InProgress', 'Completed', 'OnHold', 'Cancelled')."
+        },
+        "startDate": {
+          "type": "string",
+          "description": "The planned or actual start date of the production order.",
+          "format": "date-time"
+        },
+        "endDate": {
+          "type": "string",
+          "description": "The planned or actual end date of the production order.",
+          "format": "date-time"
+        },
+        "productionLineId": {
+          "type": "string",
+          "description": "Reference to the ProductionLine where this order is being processed. (Relationship: ProductionLine 1:N ProductionOrder)"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the production order was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp when the production order was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "orderNumber",
+        "productId",
+        "quantityPlanned",
+        "status",
+        "startDate",
+        "productionLineId",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "ProductionLine": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "ProductionLine",
+      "type": "object",
+      "description": "Defines a specific production line or workstation within a manufacturing facility, including its capacity and status.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the ProductionLine entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name or identifier of the production line."
+        },
+        "description": {
+          "type": "string",
+          "description": "A description of the production line's capabilities or function."
+        },
+        "location": {
+          "type": "string",
+          "description": "The physical location of the production line within the facility."
+        },
+        "capacityPerDay": {
+          "type": "number",
+          "description": "The maximum production capacity of the line per day, in units."
+        },
+        "status": {
+          "type": "string",
+          "description": "The current operational status of the production line (e.g., 'Operational', 'Maintenance', 'Down', 'Idle')."
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "capacityPerDay",
+        "status"
+      ]
+    },
+    "QualityInspection": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "QualityInspection",
+      "type": "object",
+      "description": "Records the results of a quality inspection performed on products or production batches.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the QualityInspection entity."
+        },
+        "productionOrderId": {
+          "type": "string",
+          "description": "Reference to the ProductionOrder associated with this inspection. (Relationship: ProductionOrder 1:N QualityInspection)"
+        },
+        "inspectorId": {
+          "type": "string",
+          "description": "Reference to the User who performed the inspection. (Relationship: User 1:N QualityInspection)"
+        },
+        "inspectionDate": {
+          "type": "string",
+          "description": "The date and time when the inspection was performed.",
+          "format": "date-time"
+        },
+        "result": {
+          "type": "string",
+          "description": "The overall result of the inspection (e.g., 'Pass', 'Fail', 'Rework', 'Conditional Pass')."
+        },
+        "notes": {
+          "type": "string",
+          "description": "Any additional notes or observations from the inspector."
+        },
+        "defectsFound": {
+          "type": "array",
+          "description": "A list of descriptions for any defects identified during the inspection.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "quantityInspected": {
+          "type": "number",
+          "description": "The total quantity of items inspected."
+        },
+        "quantityPassed": {
+          "type": "number",
+          "description": "The quantity of items that passed the inspection."
+        }
+      },
+      "required": [
+        "id",
+        "productionOrderId",
+        "inspectorId",
+        "inspectionDate",
+        "result",
+        "quantityInspected",
+        "quantityPassed"
+      ]
+    },
+    "Document": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Document",
+      "type": "object",
+      "description": "Manages various documents (e.g., procedures, specifications, reports) with version control and collaboration features.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Document entity."
+        },
+        "title": {
+          "type": "string",
+          "description": "The title of the document."
+        },
+        "description": {
+          "type": "string",
+          "description": "A brief description of the document's content."
+        },
+        "filePath": {
+          "type": "string",
+          "description": "The URI or path to the actual document file.",
+          "format": "uri"
+        },
+        "fileType": {
+          "type": "string",
+          "description": "The file type or extension (e.g., 'pdf', 'docx', 'xlsx')."
+        },
+        "version": {
+          "type": "string",
+          "description": "The version number of the document (e.g., '1.0', '1.1')."
+        },
+        "createdByUserId": {
+          "type": "string",
+          "description": "Reference to the User who originally uploaded or created the document. (Relationship: User 1:N Document)"
+        },
+        "uploadedAt": {
+          "type": "string",
+          "description": "Timestamp when the document was initially uploaded.",
+          "format": "date-time"
+        },
+        "lastModifiedByUserId": {
+          "type": "string",
+          "description": "Reference to the User who last modified or updated the document. (Relationship: User 1:N Document)"
+        },
+        "lastModifiedAt": {
+          "type": "string",
+          "description": "Timestamp when the document was last modified.",
+          "format": "date-time"
+        },
+        "tags": {
+          "type": "array",
+          "description": "A list of tags for categorizing and searching the document.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "relatedEntityId": {
+          "type": "string",
+          "description": "Optional reference to the ID of an entity this document is related to (e.g., an NCR, CAPA, or Program)."
+        },
+        "relatedEntityType": {
+          "type": "string",
+          "description": "The type of the entity related to this document (e.g., 'NonConformanceReport', 'CorrectiveActionPreventiveAction', 'Program')."
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "filePath",
+        "fileType",
+        "version",
+        "createdByUserId",
+        "uploadedAt",
+        "lastModifiedAt"
+      ]
+    },
+    "NonConformanceReport": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "NonConformanceReport",
+      "type": "object",
+      "description": "Documents and tracks non-conformances, quality deviations, or issues identified in products or processes.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the NonConformanceReport entity."
+        },
+        "ncrNumber": {
+          "type": "string",
+          "description": "The unique identifier number for this non-conformance report."
+        },
+        "title": {
+          "type": "string",
+          "description": "A concise title describing the non-conformance."
+        },
+        "description": {
+          "type": "string",
+          "description": "A detailed description of the non-conformance, including its impact."
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of the NCR (e.g., 'Open', 'Under Investigation', 'Review', 'Closed')."
+        },
+        "reportedByUserId": {
+          "type": "string",
+          "description": "Reference to the User who reported the non-conformance. (Relationship: User 1:N NonConformanceReport)"
+        },
+        "reportedDate": {
+          "type": "string",
+          "description": "The date when the non-conformance was reported.",
+          "format": "date-time"
+        },
+        "severity": {
+          "type": "string",
+          "description": "The severity level of the non-conformance (e.g., 'Minor', 'Major', 'Critical')."
+        },
+        "productionOrderId": {
+          "type": "string",
+          "description": "Optional reference to a ProductionOrder if the NCR is related to a specific production run. (Relationship: ProductionOrder 1:N NonConformanceReport)"
+        },
+        "productId": {
+          "type": "string",
+          "description": "Optional reference to a Product if the NCR is related to a specific product. (Relationship: Product 1:N NonConformanceReport)"
+        },
+        "assignedToUserId": {
+          "type": "string",
+          "description": "Reference to the User assigned to investigate or resolve the NCR. (Relationship: User 1:N NonConformanceReport)"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the NCR was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp when the NCR was last updated.",
+          "format": "date-time"
+        },
+        "documentIds": {
+          "type": "array",
+          "description": "References to supporting Document entities attached to this NCR. (Relationship: Document N:N NonConformanceReport)",
+          "items": {
+            "type": "string"
+          }
+        },
+        "capaIds": {
+          "type": "array",
+          "description": "References to CorrectiveActionPreventiveAction entities initiated from this NCR. (Relationship: CorrectiveActionPreventiveAction N:N NonConformanceReport)",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "ncrNumber",
+        "title",
+        "description",
+        "status",
+        "reportedByUserId",
+        "reportedDate",
+        "severity",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "CorrectiveActionPreventiveAction": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "CorrectiveActionPreventiveAction",
+      "type": "object",
+      "description": "Manages corrective and preventive actions to address root causes of non-conformances and prevent recurrence.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the CorrectiveActionPreventiveAction entity."
+        },
+        "capaNumber": {
+          "type": "string",
+          "description": "The unique identifier number for this CAPA."
+        },
+        "title": {
+          "type": "string",
+          "description": "A concise title describing the CAPA."
+        },
+        "description": {
+          "type": "string",
+          "description": "A detailed description of the CAPA, including the problem it addresses."
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of the CAPA (e.g., 'Open', 'In Progress', 'Awaiting Verification', 'Closed')."
+        },
+        "ncrId": {
+          "type": "string",
+          "description": "Reference to the NonConformanceReport from which this CAPA originated. (Relationship: NonConformanceReport 1:N CorrectiveActionPreventiveAction)"
+        },
+        "rootCause": {
+          "type": "string",
+          "description": "The identified root cause of the problem."
+        },
+        "correctiveActions": {
+          "type": "array",
+          "description": "A list of specific corrective actions taken.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "preventiveActions": {
+          "type": "array",
+          "description": "A list of specific preventive actions taken to avoid recurrence.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "assignedToUserId": {
+          "type": "string",
+          "description": "Reference to the User responsible for implementing the CAPA. (Relationship: User 1:N CorrectiveActionPreventiveAction)"
+        },
+        "dueDate": {
+          "type": "string",
+          "description": "The target completion date for the CAPA.",
+          "format": "date-time"
+        },
+        "completionDate": {
+          "type": "string",
+          "description": "The actual completion date of the CAPA.",
+          "format": "date-time"
+        },
+        "verifiedByUserId": {
+          "type": "string",
+          "description": "Reference to the User who verified the effectiveness of the CAPA. (Relationship: User 1:N CorrectiveActionPreventiveAction)"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the CAPA was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp when the CAPA was last updated.",
+          "format": "date-time"
+        },
+        "documentIds": {
+          "type": "array",
+          "description": "References to supporting Document entities attached to this CAPA. (Relationship: Document N:N CorrectiveActionPreventiveAction)",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "capaNumber",
+        "title",
+        "description",
+        "status",
+        "ncrId",
+        "rootCause",
+        "assignedToUserId",
+        "dueDate",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "Audit": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Audit",
+      "type": "object",
+      "description": "Tracks internal and external audits for compliance and quality assurance.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Audit entity."
+        },
+        "auditNumber": {
+          "type": "string",
+          "description": "The unique identifier for this audit."
+        },
+        "title": {
+          "type": "string",
+          "description": "A brief title for the audit."
+        },
+        "description": {
+          "type": "string",
+          "description": "A detailed description of the audit's scope and objectives."
+        },
+        "auditType": {
+          "type": "string",
+          "description": "The type of audit (e.g., 'Internal', 'External', 'Supplier', 'Product')."
+        },
+        "auditDate": {
+          "type": "string",
+          "description": "The date when the audit was conducted.",
+          "format": "date-time"
+        },
+        "auditorIds": {
+          "type": "array",
+          "description": "References to Users who performed the audit. (Relationship: User N:N Audit)",
+          "items": {
+            "type": "string"
+          }
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of the audit (e.g., 'Planned', 'In Progress', 'Completed', 'Follow-up Required')."
+        },
+        "findings": {
+          "type": "array",
+          "description": "A list of findings or observations from the audit.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "recommendations": {
+          "type": "array",
+          "description": "A list of recommendations resulting from the audit findings.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "relatedEntityId": {
+          "type": "string",
+          "description": "Optional reference to the ID of an entity this audit pertains to (e.g., a ProductionLine, Supplier, or Process)."
+        },
+        "relatedEntityType": {
+          "type": "string",
+          "description": "The type of the entity related to this audit (e.g., 'ProductionLine', 'Supplier')."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the audit record was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp when the audit record was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "auditNumber",
+        "title",
+        "auditType",
+        "auditDate",
+        "status",
+        "auditorIds",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "PurchaseOrder": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "PurchaseOrder",
+      "type": "object",
+      "description": "Records purchase orders issued to suppliers for procurement of parts and materials.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the PurchaseOrder entity."
+        },
+        "poNumber": {
+          "type": "string",
+          "description": "The unique purchase order number."
+        },
+        "supplierId": {
+          "type": "string",
+          "description": "Reference to the Supplier from whom the items are ordered. (Relationship: Supplier 1:N PurchaseOrder)"
+        },
+        "orderDate": {
+          "type": "string",
+          "description": "The date when the purchase order was issued.",
+          "format": "date-time"
+        },
+        "expectedDeliveryDate": {
+          "type": "string",
+          "description": "The anticipated date of delivery for the ordered items.",
+          "format": "date-time"
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of the purchase order (e.g., 'Draft', 'Issued', 'Partially Received', 'Received', 'Closed', 'Cancelled')."
+        },
+        "totalAmount": {
+          "type": "number",
+          "description": "The total monetary amount of the purchase order."
+        },
+        "currency": {
+          "type": "string",
+          "description": "The currency of the total amount (e.g., 'USD', 'EUR')."
+        },
+        "orderedByUserId": {
+          "type": "string",
+          "description": "Reference to the User who created or approved the purchase order. (Relationship: User 1:N PurchaseOrder)"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the purchase order was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp when the purchase order was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "poNumber",
+        "supplierId",
+        "orderDate",
+        "status",
+        "totalAmount",
+        "currency",
+        "orderedByUserId",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "Supplier": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Supplier",
+      "type": "object",
+      "description": "Stores information about suppliers of parts and materials.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Supplier entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The official name of the supplier company."
+        },
+        "contactPerson": {
+          "type": "string",
+          "description": "The primary contact person at the supplier."
+        },
+        "contactEmail": {
+          "type": "string",
+          "description": "The email address of the primary contact person.",
+          "format": "email"
+        },
+        "phoneNumber": {
+          "type": "string",
+          "description": "The phone number of the supplier."
+        },
+        "address": {
+          "type": "string",
+          "description": "The physical address of the supplier."
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "contactPerson",
+        "contactEmail",
+        "phoneNumber",
+        "address"
+      ]
+    },
+    "PurchaseOrderItem": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "PurchaseOrderItem",
+      "type": "object",
+      "description": "Represents individual line items within a Purchase Order.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the PurchaseOrderItem entity."
+        },
+        "purchaseOrderId": {
+          "type": "string",
+          "description": "Reference to the parent PurchaseOrder. (Relationship: PurchaseOrder 1:N PurchaseOrderItem)"
+        },
+        "partId": {
+          "type": "string",
+          "description": "Reference to the PartComponent being ordered. (Relationship: PartComponent 1:N PurchaseOrderItem)"
+        },
+        "quantity": {
+          "type": "number",
+          "description": "The quantity of the part ordered in this line item."
+        },
+        "unitPrice": {
+          "type": "number",
+          "description": "The price per unit of the part at the time of order."
+        },
+        "totalPrice": {
+          "type": "number",
+          "description": "The total price for this line item (quantity * unitPrice)."
+        },
+        "receivedQuantity": {
+          "type": "number",
+          "description": "The quantity of the part received so far for this line item."
+        }
+      },
+      "required": [
+        "id",
+        "purchaseOrderId",
+        "partId",
+        "quantity",
+        "unitPrice",
+        "totalPrice",
+        "receivedQuantity"
+      ]
+    },
+    "PartComponent": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "PartComponent",
+      "type": "object",
+      "description": "Defines a part or component used in manufacturing, including inventory levels and compatibility.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the PartComponent entity."
+        },
+        "partNumber": {
+          "type": "string",
+          "description": "The unique internal part number or SKU."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the part or component."
+        },
+        "description": {
+          "type": "string",
+          "description": "A detailed description of the part or component."
+        },
+        "unitOfMeasure": {
+          "type": "string",
+          "description": "The unit in which the part is measured (e.g., 'pieces', 'kg', 'meters')."
+        },
+        "currentStockLevel": {
+          "type": "number",
+          "description": "The current quantity of this part available in inventory."
+        },
+        "minStockLevel": {
+          "type": "number",
+          "description": "The minimum desired stock level for this part, triggering reorder alerts."
+        },
+        "maxStockLevel": {
+          "type": "number",
+          "description": "The maximum desired stock level for this part."
+        },
+        "supplierId": {
+          "type": "string",
+          "description": "Optional reference to the primary Supplier for this part. (Relationship: Supplier 1:N PartComponent)"
+        },
+        "isSparePart": {
+          "type": "boolean",
+          "description": "Indicates if this part is also considered a spare part for after-sales service."
+        },
+        "compatibleProductIds": {
+          "type": "array",
+          "description": "References to Product entities that this part is compatible with, particularly if it's a spare part. (Relationship: Product N:N PartComponent)",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "partNumber",
+        "name",
+        "unitOfMeasure",
+        "currentStockLevel",
+        "minStockLevel"
+      ]
+    },
+    "InventoryTransaction": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "InventoryTransaction",
+      "type": "object",
+      "description": "Records all movements of parts and components into or out of inventory.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the InventoryTransaction entity."
+        },
+        "partId": {
+          "type": "string",
+          "description": "Reference to the PartComponent involved in this transaction. (Relationship: PartComponent 1:N InventoryTransaction)"
+        },
+        "transactionType": {
+          "type": "string",
+          "description": "The type of inventory movement (e.g., 'Receipt', 'Issue', 'Adjustment', 'Return')."
+        },
+        "quantity": {
+          "type": "number",
+          "description": "The quantity of the part involved in the transaction."
+        },
+        "transactionDate": {
+          "type": "string",
+          "description": "The date and time when the transaction occurred.",
+          "format": "date-time"
+        },
+        "recordedByUserId": {
+          "type": "string",
+          "description": "Reference to the User who recorded this transaction. (Relationship: User 1:N InventoryTransaction)"
+        },
+        "referenceId": {
+          "type": "string",
+          "description": "Optional reference to the ID of the source document or entity (e.g., a PurchaseOrderItem, ProductionOrder)."
+        },
+        "referenceType": {
+          "type": "string",
+          "description": "The type of the source reference (e.g., 'PurchaseOrderItem', 'ProductionOrder')."
+        }
+      },
+      "required": [
+        "id",
+        "partId",
+        "transactionType",
+        "quantity",
+        "transactionDate",
+        "recordedByUserId"
+      ]
+    },
+    "Shipment": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Shipment",
+      "type": "object",
+      "description": "Tracks the movement of goods, including incoming supplier deliveries or outgoing product shipments.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Shipment entity."
+        },
+        "shipmentNumber": {
+          "type": "string",
+          "description": "The unique identifying number for this shipment."
+        },
+        "carrier": {
+          "type": "string",
+          "description": "The name of the shipping carrier (e.g., 'FedEx', 'UPS', 'DHL')."
+        },
+        "trackingNumber": {
+          "type": "string",
+          "description": "The tracking number provided by the carrier."
+        },
+        "originAddress": {
+          "type": "string",
+          "description": "The address from which the shipment originated."
+        },
+        "destinationAddress": {
+          "type": "string",
+          "description": "The address to which the shipment is destined."
+        },
+        "departureDate": {
+          "type": "string",
+          "description": "The date and time when the shipment departed.",
+          "format": "date-time"
+        },
+        "estimatedArrivalDate": {
+          "type": "string",
+          "description": "The estimated date and time of arrival for the shipment.",
+          "format": "date-time"
+        },
+        "actualArrivalDate": {
+          "type": "string",
+          "description": "The actual date and time of arrival for the shipment.",
+          "format": "date-time"
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of the shipment (e.g., 'Scheduled', 'In Transit', 'Delivered', 'Delayed', 'Exception')."
+        },
+        "purchaseOrderId": {
+          "type": "string",
+          "description": "Optional reference to a PurchaseOrder if this shipment is for incoming goods. (Relationship: PurchaseOrder 1:N Shipment)"
+        },
+        "partComponentIds": {
+          "type": "array",
+          "description": "References to PartComponent entities included in this shipment. (Relationship: PartComponent N:N Shipment)",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "shipmentNumber",
+        "carrier",
+        "trackingNumber",
+        "originAddress",
+        "destinationAddress",
+        "status"
+      ]
+    },
+    "Forecast": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Forecast",
+      "type": "object",
+      "description": "Stores historical or projected demand/supply forecasts for parts and components.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Forecast entity."
+        },
+        "period": {
+          "type": "string",
+          "description": "The time period for which the forecast applies (e.g., '2024-Q1', '2024-03', 'Week 15')."
+        },
+        "partId": {
+          "type": "string",
+          "description": "Reference to the PartComponent for which the forecast is made. (Relationship: PartComponent 1:N Forecast)"
+        },
+        "forecastedQuantity": {
+          "type": "number",
+          "description": "The quantity forecasted for the given period."
+        },
+        "actualQuantity": {
+          "type": "number",
+          "description": "The actual quantity observed for the given period, used for forecast accuracy analysis."
+        },
+        "forecastDate": {
+          "type": "string",
+          "description": "The date when this forecast was generated.",
+          "format": "date-time"
+        },
+        "forecastType": {
+          "type": "string",
+          "description": "The type of forecast (e.g., 'Sales Demand', 'Production Plan', 'Material Consumption')."
+        }
+      },
+      "required": [
+        "id",
+        "period",
+        "partId",
+        "forecastedQuantity",
+        "forecastDate",
+        "forecastType"
+      ]
+    },
+    "ReturnMerchandiseAuthorization": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "ReturnMerchandiseAuthorization",
+      "type": "object",
+      "description": "Manages the process for customers returning products for repair, replacement, or refund.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the ReturnMerchandiseAuthorization (RMA) entity."
+        },
+        "rmaNumber": {
+          "type": "string",
+          "description": "The unique RMA tracking number."
+        },
+        "customerId": {
+          "type": "string",
+          "description": "Reference to the Customer requesting the RMA. (Relationship: Customer 1:N ReturnMerchandiseAuthorization)"
+        },
+        "productId": {
+          "type": "string",
+          "description": "Reference to the Product being returned. (Relationship: Product 1:N ReturnMerchandiseAuthorization)"
+        },
+        "issueDate": {
+          "type": "string",
+          "description": "The date when the RMA was initiated or issued.",
+          "format": "date-time"
+        },
+        "returnReason": {
+          "type": "string",
+          "description": "The reason provided by the customer for the return."
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of the RMA (e.g., 'Requested', 'Approved', 'Received', 'Inspected', 'Processed', 'Closed')."
+        },
+        "resolution": {
+          "type": "string",
+          "description": "The chosen resolution for the RMA (e.g., 'Repair', 'Replace', 'Refund', 'Credit')."
+        },
+        "authorizedByUserId": {
+          "type": "string",
+          "description": "Reference to the User who authorized the RMA. (Relationship: User 1:N ReturnMerchandiseAuthorization)"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the RMA record was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp when the RMA record was last updated.",
+          "format": "date-time"
+        },
+        "repairIds": {
+          "type": "array",
+          "description": "References to Repair entities associated with this RMA. (Relationship: Repair N:N ReturnMerchandiseAuthorization)",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "rmaNumber",
+        "customerId",
+        "productId",
+        "issueDate",
+        "returnReason",
+        "status",
+        "authorizedByUserId",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "Customer": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Customer",
+      "type": "object",
+      "description": "Stores information about external customers who purchase or use products.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Customer entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the customer (company or individual)."
+        },
+        "contactPerson": {
+          "type": "string",
+          "description": "The primary contact person for this customer."
+        },
+        "contactEmail": {
+          "type": "string",
+          "description": "The email address of the primary contact person.",
+          "format": "email"
+        },
+        "phoneNumber": {
+          "type": "string",
+          "description": "The phone number of the customer."
+        },
+        "address": {
+          "type": "string",
+          "description": "The primary billing or shipping address of the customer."
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "contactPerson",
+        "contactEmail",
+        "phoneNumber",
+        "address"
+      ]
+    },
+    "Repair": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Repair",
+      "type": "object",
+      "description": "Tracks the process and details of product repairs, often linked to an RMA.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Repair entity."
+        },
+        "repairNumber": {
+          "type": "string",
+          "description": "A unique identifier for this repair job."
+        },
+        "rmaId": {
+          "type": "string",
+          "description": "Reference to the ReturnMerchandiseAuthorization if this repair originated from an RMA. (Relationship: ReturnMerchandiseAuthorization 1:N Repair)"
+        },
+        "technicianId": {
+          "type": "string",
+          "description": "Reference to the User (technician) assigned to perform the repair. (Relationship: User 1:N Repair)"
+        },
+        "startDate": {
+          "type": "string",
+          "description": "The date when the repair work began.",
+          "format": "date-time"
+        },
+        "completionDate": {
+          "type": "string",
+          "description": "The date when the repair work was completed.",
+          "format": "date-time"
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of the repair (e.g., 'Pending', 'In Progress', 'Awaiting Parts', 'Completed', 'Tested')."
+        },
+        "descriptionOfProblem": {
+          "type": "string",
+          "description": "A description of the problem identified during inspection or by the customer."
+        },
+        "actionsTaken": {
+          "type": "string",
+          "description": "A description of the actions performed to repair the product."
+        },
+        "partsUsedIds": {
+          "type": "array",
+          "description": "References to PartComponent entities used in this repair. (Relationship: PartComponent N:N Repair)",
+          "items": {
+            "type": "string"
+          }
+        },
+        "cost": {
+          "type": "number",
+          "description": "The total cost associated with performing the repair."
+        }
+      },
+      "required": [
+        "id",
+        "repairNumber",
+        "rmaId",
+        "technicianId",
+        "startDate",
+        "status",
+        "descriptionOfProblem",
+        "actionsTaken"
+      ]
+    },
+    "Warranty": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Warranty",
+      "type": "object",
+      "description": "Manages product warranty information, including terms and expiration dates.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Warranty entity."
+        },
+        "productId": {
+          "type": "string",
+          "description": "Reference to the Product covered by this warranty. (Relationship: Product 1:N Warranty)"
+        },
+        "customerId": {
+          "type": "string",
+          "description": "Reference to the Customer who owns the product under warranty. (Relationship: Customer 1:N Warranty)"
+        },
+        "purchaseDate": {
+          "type": "string",
+          "description": "The date when the product was purchased.",
+          "format": "date-time"
+        },
+        "warrantyEndDate": {
+          "type": "string",
+          "description": "The date when the warranty coverage expires.",
+          "format": "date-time"
+        },
+        "termsAndConditions": {
+          "type": "string",
+          "description": "A summary or link to the specific terms and conditions of this warranty."
+        },
+        "isActive": {
+          "type": "boolean",
+          "description": "Indicates whether the warranty is currently active."
+        },
+        "serialNumber": {
+          "type": "string",
+          "description": "The serial number of the product, if applicable, for unique identification."
+        }
+      },
+      "required": [
+        "id",
+        "productId",
+        "customerId",
+        "purchaseDate",
+        "warrantyEndDate",
+        "isActive"
+      ]
+    },
+    "Comment": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Comment",
+      "type": "object",
+      "description": "Represents a comment or threaded discussion entry attached to various entities for collaboration.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Comment entity."
+        },
+        "text": {
+          "type": "string",
+          "description": "The content of the comment."
+        },
+        "createdByUserId": {
+          "type": "string",
+          "description": "Reference to the User who created the comment. (Relationship: User 1:N Comment)"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the comment was created.",
+          "format": "date-time"
+        },
+        "parentId": {
+          "type": "string",
+          "description": "Optional reference to a parent Comment for threaded discussions. (Relationship: Comment 1:N Comment)"
+        },
+        "relatedEntityId": {
+          "type": "string",
+          "description": "Reference to the ID of the entity this comment is associated with (e.g., Document, Program, NCR, CAPA)."
+        },
+        "relatedEntityType": {
+          "type": "string",
+          "description": "The type of the entity this comment is associated with (e.g., 'Document', 'Program', 'NonConformanceReport', 'CorrectiveActionPreventiveAction')."
+        }
+      },
+      "required": [
+        "id",
+        "text",
+        "createdByUserId",
+        "createdAt",
+        "relatedEntityId",
+        "relatedEntityType"
+      ]
+    },
+    "KnowledgeBaseArticle": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "KnowledgeBaseArticle",
+      "type": "object",
+      "description": "Stores articles and information for a centralized knowledge base.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the KnowledgeBaseArticle entity."
+        },
+        "title": {
+          "type": "string",
+          "description": "The title of the knowledge base article."
+        },
+        "content": {
+          "type": "string",
+          "description": "The full content of the article, potentially in Markdown or HTML format."
+        },
+        "authorId": {
+          "type": "string",
+          "description": "Reference to the User who authored the article. (Relationship: User 1:N KnowledgeBaseArticle)"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the article was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp when the article was last updated.",
+          "format": "date-time"
+        },
+        "tags": {
+          "type": "array",
+          "description": "A list of tags for categorizing and searching the article.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "category": {
+          "type": "string",
+          "description": "The category the article belongs to (e.g., 'Troubleshooting', 'How-to', 'FAQ')."
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "content",
+        "authorId",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "ActivityLog": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "ActivityLog",
+      "type": "object",
+      "description": "Records significant user actions and system events for auditing and traceability.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the ActivityLog entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the User who performed the action. (Relationship: User 1:N ActivityLog)"
+        },
+        "action": {
+          "type": "string",
+          "description": "A description of the action performed (e.g., 'Created Program', 'Updated Production Order Status', 'Viewed Document')."
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "The date and time when the action occurred.",
+          "format": "date-time"
+        },
+        "entityType": {
+          "type": "string",
+          "description": "The type of entity that was affected by the action (e.g., 'Program', 'ProductionOrder', 'Document')."
+        },
+        "entityId": {
+          "type": "string",
+          "description": "The ID of the specific entity instance that was affected."
+        },
+        "details": {
+          "type": "string",
+          "description": "Additional details about the action, such as old and new values for changes."
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "action",
+        "timestamp",
+        "entityType",
+        "entityId"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Top-level collection for user profiles. Access is typically restricted to the user themselves (read/write their own profile) and administrators (read/write all profiles). Includes denormalized 'roleId' for role-based access control."
+        }
+      },
+      {
+        "path": "/roles/{roleId}",
+        "definition": {
+          "entityName": "Role",
+          "schema": {
+            "$ref": "#/backend/entities/Role"
+          },
+          "description": "Global collection defining user roles and their associated permissions. Read access for authenticated users (to retrieve their own role definitions), write access for administrators only.",
+          "params": [
+            {
+              "name": "roleId",
+              "description": "Unique identifier for the role."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/programs/{programId}",
+        "definition": {
+          "entityName": "Program",
+          "schema": {
+            "$ref": "#/backend/entities/Program"
+          },
+          "description": "Top-level collection for programs/projects. Includes a denormalized '_members' map for authorization independence, containing 'ownerId' and 'teamMemberIds' with their respective roles (e.g., {uid: 'owner', uid2: 'member'}).",
+          "params": [
+            {
+              "name": "programId",
+              "description": "Unique identifier for the program."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/programs/{programId}/kpis/{kpiId}",
+        "definition": {
+          "entityName": "KeyPerformanceIndicator",
+          "schema": {
+            "$ref": "#/backend/entities/KeyPerformanceIndicator"
+          },
+          "description": "Subcollection for Key Performance Indicators specific to a program. Each KPI document includes a denormalized '_programMembers' map from its parent program for authorization independence.",
+          "params": [
+            {
+              "name": "programId",
+              "description": "Unique identifier of the parent program."
+            },
+            {
+              "name": "kpiId",
+              "description": "Unique identifier for the KPI."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/programs/{programId}/documents/{documentId}",
+        "definition": {
+          "entityName": "Document",
+          "schema": {
+            "$ref": "#/backend/entities/Document"
+          },
+          "description": "Subcollection for documents related to a specific program. Each document includes a denormalized '_programMembers' map from its parent program for authorization independence. 'relatedEntityId' and 'relatedEntityType' are implicitly defined by the path and can be omitted in the document data.",
+          "params": [
+            {
+              "name": "programId",
+              "description": "Unique identifier of the parent program."
+            },
+            {
+              "name": "documentId",
+              "description": "Unique identifier for the document."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/programs/{programId}/comments/{commentId}",
+        "definition": {
+          "entityName": "Comment",
+          "schema": {
+            "$ref": "#/backend/entities/Comment"
+          },
+          "description": "Subcollection for comments within a specific program. Each comment includes a denormalized '_programMembers' map from its parent program for authorization independence. 'relatedEntityId' and 'relatedEntityType' are implicitly defined by the path and can be omitted in the document data.",
+          "params": [
+            {
+              "name": "programId",
+              "description": "Unique identifier of the parent program."
+            },
+            {
+              "name": "commentId",
+              "description": "Unique identifier for the comment."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/kpis_global/{kpiId}",
+        "definition": {
+          "entityName": "KeyPerformanceIndicator",
+          "schema": {
+            "$ref": "#/backend/entities/KeyPerformanceIndicator"
+          },
+          "description": "Top-level collection for global Key Performance Indicators not tied to a specific program. Access is role-based (e.g., read for Engineers, write for Admins).",
+          "params": [
+            {
+              "name": "kpiId",
+              "description": "Unique identifier for the KPI."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/alerts/{alertId}",
+        "definition": {
+          "entityName": "Alert",
+          "schema": {
+            "$ref": "#/backend/entities/Alert"
+          },
+          "description": "Top-level collection for system-generated alerts. Access is typically role-based (e.g., read for relevant operational roles) or based on 'acknowledgedByUserId' and a potential 'recipientUserId' field for direct user targeting. No denormalization of parent entity access needed, as alerts are typically system-wide or user-specific logs.",
+          "params": [
+            {
+              "name": "alertId",
+              "description": "Unique identifier for the alert."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/products/{productId}",
+        "definition": {
+          "entityName": "Product",
+          "schema": {
+            "$ref": "#/backend/entities/Product"
+          },
+          "description": "Top-level collection for product master data. Access is typically role-based (e.g., read for most users, write for Engineers/Admins).",
+          "params": [
+            {
+              "name": "productId",
+              "description": "Unique identifier for the product."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/productionLines/{productionLineId}",
+        "definition": {
+          "entityName": "ProductionLine",
+          "schema": {
+            "$ref": "#/backend/entities/ProductionLine"
+          },
+          "description": "Top-level collection for production line master data. Access is typically role-based (e.g., read for most users, write for Engineers/Admins).",
+          "params": [
+            {
+              "name": "productionLineId",
+              "description": "Unique identifier for the production line."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/productionOrders/{productionOrderId}",
+        "definition": {
+          "entityName": "ProductionOrder",
+          "schema": {
+            "$ref": "#/backend/entities/ProductionOrder"
+          },
+          "description": "Top-level collection for production orders. Access is typically role-based for operational roles (e.g., Engineers, Production Managers).",
+          "params": [
+            {
+              "name": "productionOrderId",
+              "description": "Unique identifier for the production order."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/productionOrders/{productionOrderId}/qualityInspections/{qualityInspectionId}",
+        "definition": {
+          "entityName": "QualityInspection",
+          "schema": {
+            "$ref": "#/backend/entities/QualityInspection"
+          },
+          "description": "Subcollection for quality inspections related to a specific production order. Access primarily based on 'inspectorId' and role-based access for Quality Engineers/Admins. No specific parent denormalization needed as Production Order itself does not have a user-specific 'owner' for direct access control.",
+          "params": [
+            {
+              "name": "productionOrderId",
+              "description": "Unique identifier of the parent production order."
+            },
+            {
+              "name": "qualityInspectionId",
+              "description": "Unique identifier for the quality inspection."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/productionOrders/{productionOrderId}/comments/{commentId}",
+        "definition": {
+          "entityName": "Comment",
+          "schema": {
+            "$ref": "#/backend/entities/Comment"
+          },
+          "description": "Subcollection for comments within a specific production order. Access is typically role-based for users involved in production (e.g., Engineers, Production Managers). 'relatedEntityId' and 'relatedEntityType' are implicitly defined by the path and can be omitted in the document data.",
+          "params": [
+            {
+              "name": "productionOrderId",
+              "description": "Unique identifier of the parent production order."
+            },
+            {
+              "name": "commentId",
+              "description": "Unique identifier for the comment."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/ncrs/{ncrId}",
+        "definition": {
+          "entityName": "NonConformanceReport",
+          "schema": {
+            "$ref": "#/backend/entities/NonConformanceReport"
+          },
+          "description": "Top-level collection for Non-Conformance Reports. Includes a denormalized '_members' map for authorization independence, containing 'reportedByUserId' as 'reporter' and 'assignedToUserId' as 'assignee'.",
+          "params": [
+            {
+              "name": "ncrId",
+              "description": "Unique identifier for the NCR."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/ncrs/{ncrId}/capas/{capaId}",
+        "definition": {
+          "entityName": "CorrectiveActionPreventiveAction",
+          "schema": {
+            "$ref": "#/backend/entities/CorrectiveActionPreventiveAction"
+          },
+          "description": "Subcollection for Corrective Action/Preventive Actions (CAPAs) originating from a specific NCR. Each CAPA document includes a denormalized '_ncrMembers' map from its parent NCR, and its own '_members' map for 'assignedToUserId' and 'verifiedByUserId', for authorization independence.",
+          "params": [
+            {
+              "name": "ncrId",
+              "description": "Unique identifier of the parent NCR."
+            },
+            {
+              "name": "capaId",
+              "description": "Unique identifier for the CAPA."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/ncrs/{ncrId}/documents/{documentId}",
+        "definition": {
+          "entityName": "Document",
+          "schema": {
+            "$ref": "#/backend/entities/Document"
+          },
+          "description": "Subcollection for documents related to a specific NCR. Each document includes a denormalized '_ncrMembers' map from its parent NCR for authorization independence. 'relatedEntityId' and 'relatedEntityType' are implicitly defined by the path and can be omitted in the document data.",
+          "params": [
+            {
+              "name": "ncrId",
+              "description": "Unique identifier of the parent NCR."
+            },
+            {
+              "name": "documentId",
+              "description": "Unique identifier for the document."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/ncrs/{ncrId}/comments/{commentId}",
+        "definition": {
+          "entityName": "Comment",
+          "schema": {
+            "$ref": "#/backend/entities/Comment"
+          },
+          "description": "Subcollection for comments within a specific NCR. Each comment includes a denormalized '_ncrMembers' map from its parent NCR for authorization independence. 'relatedEntityId' and 'relatedEntityType' are implicitly defined by the path and can be omitted in the document data.",
+          "params": [
+            {
+              "name": "ncrId",
+              "description": "Unique identifier of the parent NCR."
+            },
+            {
+              "name": "commentId",
+              "description": "Unique identifier for the comment."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/audits/{auditId}",
+        "definition": {
+          "entityName": "Audit",
+          "schema": {
+            "$ref": "#/backend/entities/Audit"
+          },
+          "description": "Top-level collection for audit records. Includes a denormalized '_members' map for authorization independence, containing 'auditorIds' with their roles as 'auditor'.",
+          "params": [
+            {
+              "name": "auditId",
+              "description": "Unique identifier for the audit."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/audits/{auditId}/documents/{documentId}",
+        "definition": {
+          "entityName": "Document",
+          "schema": {
+            "$ref": "#/backend/entities/Document"
+          },
+          "description": "Subcollection for documents related to a specific audit. Each document includes a denormalized '_auditMembers' map from its parent audit for authorization independence. 'relatedEntityId' and 'relatedEntityType' are implicitly defined by the path and can be omitted in the document data.",
+          "params": [
+            {
+              "name": "auditId",
+              "description": "Unique identifier of the parent audit."
+            },
+            {
+              "name": "documentId",
+              "description": "Unique identifier for the document."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/audits/{auditId}/comments/{commentId}",
+        "definition": {
+          "entityName": "Comment",
+          "schema": {
+            "$ref": "#/backend/entities/Comment"
+          },
+          "description": "Subcollection for comments within a specific audit. Each comment includes a denormalized '_auditMembers' map from its parent audit for authorization independence. 'relatedEntityId' and 'relatedEntityType' are implicitly defined by the path and can be omitted in the document data.",
+          "params": [
+            {
+              "name": "auditId",
+              "description": "Unique identifier of the parent audit."
+            },
+            {
+              "name": "commentId",
+              "description": "Unique identifier for the comment."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/suppliers/{supplierId}",
+        "definition": {
+          "entityName": "Supplier",
+          "schema": {
+            "$ref": "#/backend/entities/Supplier"
+          },
+          "description": "Top-level collection for supplier master data. Access is typically role-based (e.g., read for most users, write for Procurement/Admins).",
+          "params": [
+            {
+              "name": "supplierId",
+              "description": "Unique identifier for the supplier."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/partComponents/{partComponentId}",
+        "definition": {
+          "entityName": "PartComponent",
+          "schema": {
+            "$ref": "#/backend/entities/PartComponent"
+          },
+          "description": "Top-level collection for part and component master data. Access is typically role-based (e.g., read for most users, write for Engineers/Procurement/Admins).",
+          "params": [
+            {
+              "name": "partComponentId",
+              "description": "Unique identifier for the part component."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/purchaseOrders/{purchaseOrderId}",
+        "definition": {
+          "entityName": "PurchaseOrder",
+          "schema": {
+            "$ref": "#/backend/entities/PurchaseOrder"
+          },
+          "description": "Top-level collection for purchase orders. Includes a denormalized '_members' map for authorization independence, containing 'orderedByUserId' as 'creator'.",
+          "params": [
+            {
+              "name": "purchaseOrderId",
+              "description": "Unique identifier for the purchase order."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/purchaseOrders/{purchaseOrderId}/items/{purchaseOrderItemId}",
+        "definition": {
+          "entityName": "PurchaseOrderItem",
+          "schema": {
+            "$ref": "#/backend/entities/PurchaseOrderItem"
+          },
+          "description": "Subcollection for individual line items within a purchase order. Each item document includes a denormalized '_poMembers' map from its parent purchase order for authorization independence.",
+          "params": [
+            {
+              "name": "purchaseOrderId",
+              "description": "Unique identifier of the parent purchase order."
+            },
+            {
+              "name": "purchaseOrderItemId",
+              "description": "Unique identifier for the purchase order item."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/purchaseOrders/{purchaseOrderId}/comments/{commentId}",
+        "definition": {
+          "entityName": "Comment",
+          "schema": {
+            "$ref": "#/backend/entities/Comment"
+          },
+          "description": "Subcollection for comments within a specific purchase order. Each comment includes a denormalized '_poMembers' map from its parent purchase order for authorization independence. 'relatedEntityId' and 'relatedEntityType' are implicitly defined by the path and can be omitted in the document data.",
+          "params": [
+            {
+              "name": "purchaseOrderId",
+              "description": "Unique identifier of the parent purchase order."
+            },
+            {
+              "name": "commentId",
+              "description": "Unique identifier for the comment."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/inventoryTransactions/{inventoryTransactionId}",
+        "definition": {
+          "entityName": "InventoryTransaction",
+          "schema": {
+            "$ref": "#/backend/entities/InventoryTransaction"
+          },
+          "description": "Top-level collection for inventory movement logs. This is typically append-only and accessed based on user roles (e.g., read for Warehouse/Procurement, write for automated systems/Warehouse staff). 'recordedByUserId' is present for traceability.",
+          "params": [
+            {
+              "name": "inventoryTransactionId",
+              "description": "Unique identifier for the inventory transaction."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/shipments/{shipmentId}",
+        "definition": {
+          "entityName": "Shipment",
+          "schema": {
+            "$ref": "#/backend/entities/Shipment"
+          },
+          "description": "Top-level collection for shipment tracking data. Access is typically role-based for logistics/supply chain personnel.",
+          "params": [
+            {
+              "name": "shipmentId",
+              "description": "Unique identifier for the shipment."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/forecasts/{forecastId}",
+        "definition": {
+          "entityName": "Forecast",
+          "schema": {
+            "$ref": "#/backend/entities/Forecast"
+          },
+          "description": "Top-level collection for demand/supply forecasts. Access is typically role-based for planning/supply chain personnel.",
+          "params": [
+            {
+              "name": "forecastId",
+              "description": "Unique identifier for the forecast."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/customers/{customerId}",
+        "definition": {
+          "entityName": "Customer",
+          "schema": {
+            "$ref": "#/backend/entities/Customer"
+          },
+          "description": "Top-level collection for customer master data. Access is typically role-based (e.g., read for After-Sales/Sales, write for CRM Admins).",
+          "params": [
+            {
+              "name": "customerId",
+              "description": "Unique identifier for the customer."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/rmas/{rmaId}",
+        "definition": {
+          "entityName": "ReturnMerchandiseAuthorization",
+          "schema": {
+            "$ref": "#/backend/entities/ReturnMerchandiseAuthorization"
+          },
+          "description": "Top-level collection for Return Merchandise Authorizations. Includes a denormalized '_members' map for authorization independence, containing 'authorizedByUserId' as 'authorizer'.",
+          "params": [
+            {
+              "name": "rmaId",
+              "description": "Unique identifier for the RMA."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/rmas/{rmaId}/repairs/{repairId}",
+        "definition": {
+          "entityName": "Repair",
+          "schema": {
+            "$ref": "#/backend/entities/Repair"
+          },
+          "description": "Subcollection for repair records associated with an RMA. Each repair document includes a denormalized '_rmaMembers' map from its parent RMA, and its own '_members' map for 'technicianId', for authorization independence.",
+          "params": [
+            {
+              "name": "rmaId",
+              "description": "Unique identifier of the parent RMA."
+            },
+            {
+              "name": "repairId",
+              "description": "Unique identifier for the repair."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/rmas/{rmaId}/documents/{documentId}",
+        "definition": {
+          "entityName": "Document",
+          "schema": {
+            "$ref": "#/backend/entities/Document"
+          },
+          "description": "Subcollection for documents related to a specific RMA. Each document includes a denormalized '_rmaMembers' map from its parent RMA for authorization independence. 'relatedEntityId' and 'relatedEntityType' are implicitly defined by the path and can be omitted in the document data.",
+          "params": [
+            {
+              "name": "rmaId",
+              "description": "Unique identifier of the parent RMA."
+            },
+            {
+              "name": "documentId",
+              "description": "Unique identifier for the document."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/rmas/{rmaId}/comments/{commentId}",
+        "definition": {
+          "entityName": "Comment",
+          "schema": {
+            "$ref": "#/backend/entities/Comment"
+          },
+          "description": "Subcollection for comments within a specific RMA. Each comment includes a denormalized '_rmaMembers' map from its parent RMA for authorization independence. 'relatedEntityId' and 'relatedEntityType' are implicitly defined by the path and can be omitted in the document data.",
+          "params": [
+            {
+              "name": "rmaId",
+              "description": "Unique identifier of the parent RMA."
+            },
+            {
+              "name": "commentId",
+              "description": "Unique identifier for the comment."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/warranties/{warrantyId}",
+        "definition": {
+          "entityName": "Warranty",
+          "schema": {
+            "$ref": "#/backend/entities/Warranty"
+          },
+          "description": "Top-level collection for warranty information. Access is typically role-based for after-sales support and potentially read-only for customers viewing their own warranties (if customer UIDs are managed).",
+          "params": [
+            {
+              "name": "warrantyId",
+              "description": "Unique identifier for the warranty."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/knowledgeBaseArticles/{knowledgeBaseArticleId}",
+        "definition": {
+          "entityName": "KnowledgeBaseArticle",
+          "schema": {
+            "$ref": "#/backend/entities/KnowledgeBaseArticle"
+          },
+          "description": "Top-level collection for knowledge base articles. Read access for all authenticated users (or potentially unauthenticated for public knowledge), write access for 'authorId' and administrators.",
+          "params": [
+            {
+              "name": "knowledgeBaseArticleId",
+              "description": "Unique identifier for the knowledge base article."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/activityLogs/{activityLogId}",
+        "definition": {
+          "entityName": "ActivityLog",
+          "schema": {
+            "$ref": "#/backend/entities/ActivityLog"
+          },
+          "description": "Top-level collection for system and user activity logs. This is typically append-only. Read access for administrators to all logs, and for individual users to their own logs (where 'userId' matches 'request.auth.uid').",
+          "params": [
+            {
+              "name": "activityLogId",
+              "description": "Unique identifier for the activity log entry."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure for FactoryIQ prioritizes **Authorization Independence** and **Clarity of Intent** by extensively using denormalization and structural segregation. Each document that requires granular access control will include a `_members` map (or relevant single user ID fields) directly within its data, containing the UIDs of users who have specific access (e.g., 'owner', 'member', 'reporter', 'assignee') to that document. This eliminates the need for expensive and rule-breaking `get()` calls to parent documents for authorization checks, adhering strictly to the **CRITICAL** Authorization Independence mandate. For example, a `Program` document will have a `_members` map containing its `ownerId` and `teamMemberIds`, and any subcollection documents (like `KPIs`, `Documents`, or `Comments` related to that program) will denormalize this `_programMembers` map. This ensures that a `Comment` document, for instance, can be authorized for read/write without needing to fetch its parent `Program` document.\n\n**Structural Segregation** is applied by separating collections based on their security posture. For instance, `kpis_global` will exist for system-wide KPIs, while program-specific KPIs reside under `/programs/{programId}/kpis/{kpiId}`. This simplifies security rules by ensuring all documents within a given collection or subcollection share similar access requirements. `Comment` and `Document` entities, which can relate to multiple parent types, are consistently placed as subcollections (e.g., `/programs/{programId}/documents/{documentId}`), with denormalized parent authorization fields, making their access context explicit and debuggable.\n\n**QAPs (Rules are not Filters)** are enabled because all necessary authorization context is present within the document being accessed or listed. When a user requests a list of documents in a subcollection (e.g., `/programs/{programId}/comments`), the Firestore rules can efficiently filter results by checking `request.auth.uid` against the denormalized `_programMembers` map in each `Comment` document, allowing secure `list` operations without exposing unauthorized data. Similarly, top-level collections like `alerts` or `activityLogs` can be queried securely by checking `request.auth.uid` against specific `userId` or `recipientUserId` fields, or by validating the user's role against predefined role-based access rules. Global entities like `Products` or `Suppliers` are accessible based on a user's role (DBAC model), with roles stored in the `/roles` collection and referenced by `userId` in `_users`."
+  }
+}
