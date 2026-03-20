@@ -7,12 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Factory, Loader2, ArrowRight, ShieldCheck } from "lucide-react";
+import { Factory, Loader2, ShieldCheck, AlertCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
 
 export default function LoginPage() {
   const auth = useAuth();
-  const router = useRouter();
+  const { toast } = useToast();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -20,35 +21,50 @@ export default function LoginPage() {
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    
+    // Attempting sign in. Error handling is now internal to the call via toast
+    // or through standard rejection handling.
     try {
-      initiateEmailSignIn(auth, email, password);
-      // Auth state change will be handled by the layout's AuthGuard
-    } catch (error) {
-      console.error(error);
+      await initiateEmailSignIn(auth, email, password);
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Authentication Failed",
+        description: error.message || "Invalid credentials. Please try again.",
+      });
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleGuestSignIn = () => {
+  const handleGuestSignIn = async () => {
     setIsLoading(true);
-    initiateAnonymousSignIn(auth);
+    try {
+      await initiateAnonymousSignIn(auth);
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Guest Access Failed",
+        description: error.message,
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <div className="flex min-h-screen items-center justify-center p-4 bg-slate-950 overflow-hidden relative">
-      {/* Decorative Background Elements */}
-      <div className="absolute top-0 -left-4 w-72 h-72 bg-primary/30 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-pulse" />
-      <div className="absolute bottom-0 -right-4 w-72 h-72 bg-accent/30 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-pulse delay-700" />
+      <div className="absolute top-0 -left-4 w-96 h-96 bg-primary/20 rounded-full mix-blend-screen filter blur-3xl opacity-50 animate-pulse" />
+      <div className="absolute bottom-0 -right-4 w-96 h-96 bg-accent/20 rounded-full mix-blend-screen filter blur-3xl opacity-50 animate-pulse delay-700" />
       
-      <Card className="w-full max-w-md glass-card border-none bg-white/5 backdrop-blur-2xl text-white">
+      <Card className="w-full max-w-md glass-card border-none bg-white/5 backdrop-blur-3xl text-white">
         <CardHeader className="space-y-1 text-center">
           <div className="flex justify-center mb-4">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary text-white shadow-lg shadow-primary/20">
-              <Factory className="h-8 w-8" />
+            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary text-white shadow-2xl shadow-primary/40">
+              <Factory className="h-10 w-10" />
             </div>
           </div>
-          <CardTitle className="text-3xl font-bold tracking-tight">FactoryIQ</CardTitle>
+          <CardTitle className="text-4xl font-bold tracking-tight bg-gradient-to-b from-white to-slate-400 bg-clip-text text-transparent">FactoryIQ</CardTitle>
           <CardDescription className="text-slate-400">
             Manufacturing Excellence & Intelligence Portal
           </CardDescription>
@@ -60,47 +76,50 @@ export default function LoginPage() {
               <Input
                 id="email"
                 type="email"
-                placeholder="name@company.com"
+                placeholder="ratan@factoryiq.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="bg-white/10 border-white/10 text-white placeholder:text-slate-500 h-11"
+                className="bg-white/5 border-white/10 text-white placeholder:text-slate-600 h-12"
                 required
               />
             </div>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="password" title="Try 'password123' for demo" className="text-slate-200">Password</Label>
-                <Button variant="link" className="px-0 font-normal text-xs text-primary">Forgot password?</Button>
               </div>
               <Input
                 id="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="bg-white/10 border-white/10 text-white h-11"
+                className="bg-white/5 border-white/10 text-white h-12"
                 required
               />
             </div>
-            <Button type="submit" className="w-full h-11 font-semibold text-lg" disabled={isLoading}>
+            <div className="flex items-center gap-2 p-3 rounded-lg bg-primary/10 border border-primary/20 text-xs text-primary-foreground/80">
+              <AlertCircle className="h-4 w-4 shrink-0" />
+              <span>Use <strong>ratan@factoryiq.com</strong> and <strong>factory123</strong> for demo access.</span>
+            </div>
+            <Button type="submit" className="w-full h-12 font-bold text-lg shadow-lg shadow-primary/20" disabled={isLoading}>
               {isLoading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : "Sign In"}
             </Button>
           </CardContent>
         </form>
         <div className="relative px-6 pb-4">
           <div className="absolute inset-0 flex items-center px-6">
-            <span className="w-full border-t border-white/10" />
+            <span className="w-full border-t border-white/5" />
           </div>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-slate-950 px-2 text-slate-500">Or continue as</span>
+          <div className="relative flex justify-center text-[10px] uppercase font-bold tracking-widest">
+            <span className="bg-[#020617] px-3 text-slate-500">Secure Gateway</span>
           </div>
         </div>
-        <CardFooter className="flex flex-col gap-4">
-          <Button variant="outline" onClick={handleGuestSignIn} className="w-full h-11 bg-transparent border-white/10 text-white hover:bg-white/5" disabled={isLoading}>
+        <CardFooter className="flex flex-col gap-4 pb-8">
+          <Button variant="outline" onClick={handleGuestSignIn} className="w-full h-12 bg-transparent border-white/10 text-white hover:bg-white/5 hover:text-white" disabled={isLoading}>
             Guest Operations Manager
           </Button>
-          <div className="flex items-center justify-center gap-2 text-xs text-slate-500">
+          <div className="flex items-center justify-center gap-2 text-[10px] text-slate-500 font-bold uppercase tracking-wider">
             <ShieldCheck className="h-3 w-3" />
-            Enterprise-grade secure access
+            Enterprise-grade encrypted access
           </div>
         </CardFooter>
       </Card>

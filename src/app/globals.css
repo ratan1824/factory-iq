@@ -4,24 +4,24 @@
 
 @layer base {
   :root {
-    --background: 220 33% 98%;
-    --foreground: 224 71% 4%;
-    --card: 0 0% 100%;
-    --card-foreground: 224 71% 4%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 224 71% 4%;
+    --background: 224 71% 4%;
+    --foreground: 213 31% 91%;
+    --card: 224 71% 4%;
+    --card-foreground: 213 31% 91%;
+    --popover: 224 71% 4%;
+    --popover-foreground: 213 31% 91%;
     --primary: 243 75% 59%;
     --primary-foreground: 210 40% 98%;
-    --secondary: 220 14% 96%;
-    --secondary-foreground: 224 71% 4%;
-    --muted: 220 14% 96%;
-    --muted-foreground: 220 8.9% 46.1%;
+    --secondary: 222 47% 11%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 222 47% 11%;
+    --muted-foreground: 215 20.2% 65.1%;
     --accent: 199 89% 48%;
     --accent-foreground: 210 40% 98%;
-    --destructive: 0 84.2% 60.2%;
+    --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
+    --border: 217 32% 17%;
+    --input: 217 32% 17%;
     --ring: 243 75% 59%;
     --radius: 1rem;
   }
@@ -34,23 +34,27 @@
   body {
     @apply bg-background text-foreground font-body antialiased;
     background-image: 
-      radial-gradient(at 0% 0%, hsla(243, 75%, 93%, 0.4) 0, transparent 50%),
-      radial-gradient(at 100% 100%, hsla(199, 89%, 95%, 0.4) 0, transparent 50%),
-      radial-gradient(at 50% 50%, hsla(220, 33%, 98%, 1) 0, transparent 100%);
+      radial-gradient(at 0% 0%, hsla(243, 75%, 20%, 0.4) 0, transparent 50%),
+      radial-gradient(at 100% 100%, hsla(199, 89%, 20%, 0.4) 0, transparent 50%),
+      radial-gradient(at 50% 50%, hsla(224, 71%, 4%, 1) 0, transparent 100%);
     background-attachment: fixed;
   }
 }
 
 .glass-card {
-  @apply bg-white/60 backdrop-blur-xl border border-white/40 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)];
+  @apply bg-white/5 backdrop-blur-2xl border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)];
 }
 
 .glass-nav {
-  @apply bg-white/70 backdrop-blur-lg border-b border-white/20 sticky top-0 z-50;
+  @apply bg-slate-950/60 backdrop-blur-xl border-b border-white/5 sticky top-0 z-50;
 }
 
 .sidebar-glass {
-  @apply bg-slate-900/95 backdrop-blur-xl border-r border-white/10;
+  @apply bg-slate-950/80 backdrop-blur-2xl border-r border-white/5;
+}
+
+.page-heading {
+  @apply text-3xl font-bold tracking-tight bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent;
 }
 
 .animate-in {
