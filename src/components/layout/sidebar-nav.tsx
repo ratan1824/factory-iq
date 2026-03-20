@@ -26,9 +26,9 @@ const navItems = [
   { name: "Programs", icon: Briefcase, href: "/programs", roles: ['owner'] },
   { name: "Production", icon: Factory, href: "/production", roles: ['owner'] },
   { name: "Quality", icon: ShieldCheck, href: "/quality", roles: ['owner'] },
-  { name: "Supply Chain", icon: Truck, href: "/supply-chain", roles: ['owner'] },
-  { name: "After-Sales", icon: Wrench, href: "/after-sales", roles: ['owner'] },
-  { name: "Collaboration", icon: MessageSquare, href: "/collaboration", roles: ['owner'] },
+  { name: "Supply Chain Logistics", icon: Truck, href: "/supply-chain", roles: ['owner', 'user'] },
+  { name: "After-Supply Analysis", icon: Wrench, href: "/after-sales", roles: ['owner', 'user'] },
+  { name: "Collaboration", icon: MessageSquare, href: "/collaboration", roles: ['owner', 'user'] },
   { name: "Analytics", icon: BarChart3, href: "/analytics", roles: ['owner'] },
   { name: "Integrations", icon: Link2, href: "/integrations", roles: ['owner'] },
 ];
