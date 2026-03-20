@@ -2,18 +2,19 @@
 "use client";
 
 import { useState } from "react";
-import { useAuth } from "@/firebase";
-import { initiateEmailSignIn } from "@/firebase/non-blocking-login";
+import { useAuth, useFirestore } from "@/firebase";
+import { initiateEmailSignIn, initiateAnonymousSignIn } from "@/firebase/non-blocking-login";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Factory, Loader2, ShieldCheck, AlertCircle, User, Shield } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { Factory, Loader2, User, Shield } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { doc, setDoc } from "firebase/firestore";
 
 export default function LoginPage() {
   const auth = useAuth();
+  const firestore = useFirestore();
   const { toast } = useToast();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -37,16 +38,32 @@ export default function LoginPage() {
 
   const quickLogin = async (role: 'owner' | 'user') => {
     setIsLoading(true);
-    const email = role === 'owner' ? 'admin@factoryiq.com' : 'user@factoryiq.com';
     try {
-      // In a prototype, we assume these users exist. 
-      // User would need to create them in Firebase Console first.
-      await initiateEmailSignIn(auth, email, 'factory123');
+      // Use Anonymous sign-in for zero-config demo access
+      const cred = await initiateAnonymousSignIn(auth);
+      
+      // Auto-initialize the user profile in Firestore
+      const userRef = doc(firestore, 'users', cred.user.uid);
+      await setDoc(userRef, {
+        id: cred.user.uid,
+        role: role,
+        firstName: role === 'owner' ? 'Ratan' : 'Engineer',
+        lastName: role === 'owner' ? 'Kollabathula' : 'Demo',
+        email: role === 'owner' ? 'admin@factoryiq.com' : 'user@factoryiq.com',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      }, { merge: true });
+
+      toast({
+        title: "Access Authorized",
+        description: `Successfully logged in as ${role === 'owner' ? 'Administrator' : 'Manufacturing Engineer'}.`,
+      });
     } catch (error: any) {
+      console.error(error);
       toast({
         variant: "destructive",
         title: "Quick Login Failed",
-        description: "Credentials not initialized in Firebase. Use standard login or create users in console.",
+        description: error.message || "Initialization error.",
       });
     } finally {
       setIsLoading(false);
@@ -55,11 +72,10 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center p-4 bg-slate-950 overflow-hidden relative">
-      {/* Decorative background elements */}
       <div className="absolute top-0 -left-4 w-[500px] h-[500px] bg-primary/20 rounded-full mix-blend-screen filter blur-[120px] opacity-40 animate-pulse" />
       <div className="absolute bottom-0 -right-4 w-[500px] h-[500px] bg-accent/20 rounded-full mix-blend-screen filter blur-[120px] opacity-40 animate-pulse delay-700" />
       
-      <Card className="w-full max-w-md glass-card border-none bg-white/5 backdrop-blur-3xl text-white shadow-2xl">
+      <Card className="w-full max-w-md glass-card border-none bg-white/5 backdrop-blur-3xl text-white shadow-2xl z-10">
         <CardHeader className="space-y-1 text-center pb-8">
           <div className="flex justify-center mb-6">
             <div className="flex h-20 w-20 items-center justify-center rounded-[2rem] bg-gradient-to-tr from-primary to-accent text-white shadow-2xl shadow-primary/40 rotate-12 hover:rotate-0 transition-transform duration-500">
@@ -82,7 +98,6 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="bg-white/5 border-white/10 text-white placeholder:text-slate-600 h-12 rounded-xl focus:ring-primary/40"
-                required
               />
             </div>
             <div className="space-y-2">
@@ -93,7 +108,6 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="bg-white/5 border-white/10 text-white h-12 rounded-xl focus:ring-primary/40"
-                required
               />
             </div>
             <Button type="submit" className="w-full h-12 font-bold text-lg shadow-lg shadow-primary/30 rounded-xl bg-primary hover:bg-primary/80 transition-all" disabled={isLoading}>
@@ -107,7 +121,7 @@ export default function LoginPage() {
             <span className="w-full border-t border-white/5" />
           </div>
           <div className="relative flex justify-center text-[10px] uppercase font-black tracking-[0.2em]">
-            <span className="bg-[#020617] px-4 text-slate-500">Demo Mode</span>
+            <span className="bg-[#020617] px-4 text-slate-500">Instant Demo Access</span>
           </div>
         </div>
 
@@ -116,29 +130,30 @@ export default function LoginPage() {
             <Button 
               variant="outline" 
               onClick={() => quickLogin('owner')} 
-              className="h-14 bg-white/5 border-white/10 text-white hover:bg-primary/20 hover:border-primary/40 rounded-xl group"
+              className="h-16 bg-white/5 border-white/10 text-white hover:bg-primary/20 hover:border-primary/40 rounded-xl group transition-all"
               disabled={isLoading}
             >
               <div className="flex flex-col items-center gap-1">
-                <Shield className="h-4 w-4 text-primary group-hover:scale-110 transition-transform" />
-                <span className="text-[10px] font-bold uppercase">Owner</span>
+                <Shield className="h-5 w-5 text-primary group-hover:scale-110 transition-transform" />
+                <span className="text-[10px] font-bold uppercase tracking-wider">Owner Profile</span>
               </div>
             </Button>
             <Button 
               variant="outline" 
               onClick={() => quickLogin('user')} 
-              className="h-14 bg-white/5 border-white/10 text-white hover:bg-accent/20 hover:border-accent/40 rounded-xl group"
+              className="h-16 bg-white/5 border-white/10 text-white hover:bg-accent/20 hover:border-accent/40 rounded-xl group transition-all"
               disabled={isLoading}
             >
               <div className="flex flex-col items-center gap-1">
-                <User className="h-4 w-4 text-accent group-hover:scale-110 transition-transform" />
-                <span className="text-[10px] font-bold uppercase">Engineer</span>
+                <User className="h-5 w-5 text-accent group-hover:scale-110 transition-transform" />
+                <span className="text-[10px] font-bold uppercase tracking-wider">Engineer Profile</span>
               </div>
             </Button>
           </div>
-          <div className="bg-primary/10 rounded-lg p-3 w-full border border-primary/20">
-             <p className="text-[10px] font-bold text-primary-foreground uppercase text-center mb-1">Demo Credentials</p>
-             <p className="text-[10px] text-slate-400 text-center">User: admin@factoryiq.com | Pass: factory123</p>
+          <div className="bg-primary/10 rounded-lg p-3 w-full border border-primary/20 mt-2">
+             <p className="text-[10px] text-slate-400 text-center leading-relaxed">
+               Click a profile above to instantly enter the portal with predefined roles. No configuration required.
+             </p>
           </div>
         </CardFooter>
       </Card>

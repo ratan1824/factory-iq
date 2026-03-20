@@ -50,7 +50,7 @@ export default function ProgramsPage() {
       <div className="flex items-end justify-between">
         <div>
           <h1 className="page-heading">Program Portfolio</h1>
-          <p className="text-muted-foreground mt-1 text-sm">Global engineering lifecycle and NPI milestone visibility.</p>
+          <p className="text-muted-foreground mt-1 text-sm font-medium">Global engineering lifecycle and NPI milestone visibility.</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" className="glass-card border-white/10 hover:bg-white/5">
@@ -73,27 +73,27 @@ export default function ProgramsPage() {
           />
         </div>
         <div className="flex gap-2">
-          <Badge variant="secondary" className="px-4 py-1.5 rounded-full bg-primary/20 text-primary-foreground border-none">{filteredPrograms.length} Active</Badge>
-          <Badge variant="outline" className="px-4 py-1.5 rounded-full border-white/10 text-muted-foreground">2 Archived</Badge>
+          <Badge variant="secondary" className="px-4 py-1.5 rounded-full bg-primary/20 text-primary-foreground border-none font-bold uppercase tracking-wider text-[10px]">{filteredPrograms.length} Active</Badge>
+          <Badge variant="outline" className="px-4 py-1.5 rounded-full border-white/10 text-muted-foreground font-bold uppercase tracking-wider text-[10px]">2 Archived</Badge>
         </div>
       </div>
 
-      <Card className="glass-card border-none overflow-hidden rounded-2xl">
+      <Card className="glass-card border-none overflow-hidden rounded-2xl shadow-2xl">
         <CardContent className="p-0">
           <Table>
             <TableHeader className="bg-white/5">
               <TableRow className="hover:bg-transparent border-white/5">
-                <TableHead className="cursor-pointer hover:text-primary transition-colors py-4 text-slate-300" onClick={() => toggleSort("name")}>
+                <TableHead className="cursor-pointer hover:text-primary transition-colors py-4 text-slate-300 font-bold uppercase tracking-widest text-[10px]" onClick={() => toggleSort("name")}>
                   Program <ArrowUpDown className="inline ml-1 h-3 w-3" />
                 </TableHead>
-                <TableHead className="cursor-pointer hover:text-primary transition-colors text-slate-300" onClick={() => toggleSort("status")}>
+                <TableHead className="cursor-pointer hover:text-primary transition-colors text-slate-300 font-bold uppercase tracking-widest text-[10px]" onClick={() => toggleSort("status")}>
                   Status <ArrowUpDown className="inline ml-1 h-3 w-3" />
                 </TableHead>
-                <TableHead className="text-slate-300">Site</TableHead>
-                <TableHead className="text-slate-300">Manager</TableHead>
-                <TableHead className="text-slate-300">Phase</TableHead>
-                <TableHead className="w-[200px] text-slate-300">Completion</TableHead>
-                <TableHead className="text-right text-slate-300">View</TableHead>
+                <TableHead className="text-slate-300 font-bold uppercase tracking-widest text-[10px]">Site</TableHead>
+                <TableHead className="text-slate-300 font-bold uppercase tracking-widest text-[10px]">Manager</TableHead>
+                <TableHead className="text-slate-300 font-bold uppercase tracking-widest text-[10px]">Phase</TableHead>
+                <TableHead className="w-[200px] text-slate-300 font-bold uppercase tracking-widest text-[10px]">Completion</TableHead>
+                <TableHead className="text-right text-slate-300 font-bold uppercase tracking-widest text-[10px]">View</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -102,12 +102,12 @@ export default function ProgramsPage() {
                   <TableCell>
                     <div className="flex flex-col">
                       <span className="font-semibold text-white">{program.name}</span>
-                      <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{program.id}</span>
+                      <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest leading-relaxed">{program.id}</span>
                     </div>
                   </TableCell>
                   <TableCell>
                     <Badge className={cn(
-                      "font-bold px-3 py-0.5 rounded-full",
+                      "font-bold px-3 py-0.5 rounded-full text-[10px] uppercase tracking-wider",
                       program.status === 'Green' ? "bg-emerald-500 hover:bg-emerald-600" :
                       program.status === 'Yellow' ? "bg-amber-500 hover:bg-amber-600" : "bg-rose-500 hover:bg-rose-600"
                     )}>
@@ -115,22 +115,22 @@ export default function ProgramsPage() {
                     </Badge>
                   </TableCell>
                   <TableCell className="text-xs font-medium text-slate-400">{program.site}</TableCell>
-                  <TableCell className="text-sm text-slate-400">{program.manager}</TableCell>
+                  <TableCell className="text-sm text-slate-400 font-medium">{program.manager}</TableCell>
                   <TableCell>
-                    <Badge variant="outline" className="border-accent/20 text-accent bg-accent/10 rounded-full">{program.phase}</Badge>
+                    <Badge variant="outline" className="border-accent/20 text-accent bg-accent/10 rounded-full text-[10px] font-bold uppercase tracking-widest px-3">{program.phase}</Badge>
                   </TableCell>
                   <TableCell>
                     <div className="space-y-1.5">
-                      <div className="flex justify-between text-[10px] font-bold uppercase text-muted-foreground">
-                        <span>{program.completion}%</span>
+                      <div className="flex justify-between text-[9px] font-black uppercase text-muted-foreground tracking-[0.1em]">
+                        <span>{program.completion}% COMPLETED</span>
                       </div>
                       <Progress value={program.completion} className="h-1.5 bg-white/5" />
                     </div>
                   </TableCell>
                   <TableCell className="text-right">
                     <Link href={`/programs/${program.id}`}>
-                      <Button variant="ghost" size="sm" className="rounded-full hover:bg-primary hover:text-white transition-all">
-                        Details <ChevronRight className="ml-1 h-4 w-4" />
+                      <Button variant="ghost" size="sm" className="rounded-full hover:bg-primary hover:text-white transition-all font-bold text-[11px] uppercase tracking-wider">
+                        Explore <ChevronRight className="ml-1 h-3 w-3" />
                       </Button>
                     </Link>
                   </TableCell>
