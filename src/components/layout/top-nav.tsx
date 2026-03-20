@@ -20,14 +20,12 @@ import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { useAuth, useUser } from "@/firebase";
 import { signOut } from "firebase/auth";
-import { CreateProgramDialog } from "@/components/programs/create-program-dialog";
 import { Badge } from "@/components/ui/badge";
 
 export function TopNav() {
   const { toast } = useToast();
   const auth = useAuth();
   const { user, profile } = useUser();
-  const [createDialogOpen, setCreateDialogOpen] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -39,12 +37,7 @@ export function TopNav() {
   };
 
   const handleAction = (action: string) => {
-    if (action === "New Program") {
-      setCreateDialogOpen(true);
-      return;
-    }
-    
-    // Simulate active processing for other operations
+    // Simulate active processing for system operations
     toast({ 
       title: "Executing Command", 
       description: `Initiating ${action} sequence...`,
@@ -83,11 +76,11 @@ export function TopNav() {
               <DropdownMenuLabel className="px-2 py-1.5 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Master Control</DropdownMenuLabel>
               <DropdownMenuSeparator className="bg-white/5" />
               <DropdownMenuGroup>
-                <DropdownMenuItem className="rounded-lg focus:bg-primary/20 text-sm font-medium cursor-pointer" onClick={() => handleAction("New Program")}>
-                  Initialize New Program
-                </DropdownMenuItem>
                 <DropdownMenuItem className="rounded-lg focus:bg-primary/20 text-sm font-medium cursor-pointer" onClick={() => handleAction("Quality Incident")}>
                   Log Quality Incident
+                </DropdownMenuItem>
+                <DropdownMenuItem className="rounded-lg focus:bg-primary/20 text-sm font-medium cursor-pointer" onClick={() => handleAction("Supply Chain Audit")}>
+                  Initiate Supply Audit
                 </DropdownMenuItem>
                 <DropdownMenuItem className="rounded-lg focus:bg-primary/20 text-sm font-medium cursor-pointer" onClick={() => handleAction("Emergency Stop")}>
                   Trigger Emergency Stop
@@ -163,8 +156,6 @@ export function TopNav() {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-
-      <CreateProgramDialog open={createDialogOpen} onOpenChange={setCreateDialogOpen} />
     </header>
   );
 }
