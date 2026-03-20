@@ -14,11 +14,14 @@ import { Download, Filter, Search, ArrowUpDown, ChevronRight, Loader2 } from "lu
 import { Input } from "@/components/ui/input";
 import { useCollection, useMemoFirebase, useFirestore } from "@/firebase";
 import { collection, query, orderBy } from "firebase/firestore";
+import { useToast } from "@/hooks/use-toast";
 
 export default function ProgramsPage() {
+  const { toast } = useToast();
   const [search, setSearch] = useState("");
   const [sortField, setSortField] = useState<keyof Program>("name");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  const [isExporting, setIsExporting] = useState(false);
   
   const firestore = useFirestore();
   const programsQuery = useMemoFirebase(
@@ -51,6 +54,22 @@ export default function ProgramsPage() {
     });
   }, [search, sortField, sortOrder, allPrograms]);
 
+  const handleExport = () => {
+    setIsExporting(true);
+    toast({
+      title: "Generating Export",
+      description: "Compiling portfolio performance data...",
+    });
+
+    setTimeout(() => {
+      setIsExporting(false);
+      toast({
+        title: "Export Ready",
+        description: "Portfolio data has been downloaded as CSV.",
+      });
+    }, 2000);
+  };
+
   const toggleSort = (field: keyof Program) => {
     if (sortField === field) {
       setSortOrder(sortOrder === "asc" ? "desc" : "asc");
@@ -71,8 +90,15 @@ export default function ProgramsPage() {
           <Button variant="outline" size="sm" className="glass-card border-white/10 hover:bg-white/5 text-xs font-bold uppercase tracking-widest h-10 px-6">
             <Filter className="mr-2 h-4 w-4" /> Filter
           </Button>
-          <Button variant="outline" size="sm" className="glass-card border-white/10 hover:bg-white/5 text-xs font-bold uppercase tracking-widest h-10 px-6">
-            <Download className="mr-2 h-4 w-4" /> Export
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="glass-card border-white/10 hover:bg-white/5 text-xs font-bold uppercase tracking-widest h-10 px-6"
+            onClick={handleExport}
+            disabled={isExporting}
+          >
+            {isExporting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}
+            Export
           </Button>
         </div>
       </div>

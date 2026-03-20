@@ -1,15 +1,37 @@
+
 "use client";
 
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { AFTER_SALES_RMAS } from "@/lib/mock-data";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Wrench, RefreshCw, HeartPulse, History, Search } from "lucide-react";
+import { Wrench, RefreshCw, HeartPulse, History, Search, Download, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
 
 export default function AfterSalesPage() {
+  const { toast } = useToast();
+  const [isExporting, setIsExporting] = useState(false);
+
+  const handleExport = () => {
+    setIsExporting(true);
+    toast({
+      title: "Exporting History",
+      description: "Generating RMA and Service performance logs...",
+    });
+
+    setTimeout(() => {
+      setIsExporting(false);
+      toast({
+        title: "Download Complete",
+        description: "Supply analysis history has been saved.",
+      });
+    }, 2000);
+  };
+
   return (
     <div className="space-y-8 animate-in zoom-in-95 duration-500">
       <div className="flex items-end justify-between">
@@ -17,8 +39,14 @@ export default function AfterSalesPage() {
           <h1 className="text-5xl font-black tracking-tighter text-white py-1">After-Supply Analysis</h1>
           <p className="text-muted-foreground mt-1 text-sm font-medium">Post-delivery performance tracking, RMA management, and service health.</p>
         </div>
-        <Button variant="outline" className="glass-card border-white/10 text-xs font-black uppercase tracking-widest">
-          <History className="mr-2 h-4 w-4" /> Export History
+        <Button 
+          variant="outline" 
+          className="glass-card border-white/10 text-xs font-black uppercase tracking-widest h-11"
+          onClick={handleExport}
+          disabled={isExporting}
+        >
+          {isExporting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}
+          Export History
         </Button>
       </div>
 

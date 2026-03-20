@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useMemo } from "react";
@@ -22,6 +23,7 @@ import {
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { cn } from "@/lib/utils";
 
 export default function ProgramDetailPage() {
   const { id } = useParams();
@@ -51,8 +53,9 @@ export default function ProgramDetailPage() {
             <div className="flex items-center gap-3">
               <h1 className="text-3xl font-bold tracking-tight text-primary">{program.name}</h1>
               <Badge className={cn(
-                program.status === 'Green' ? "bg-emerald-500" :
-                program.status === 'Yellow' ? "bg-amber-500" : "bg-rose-500"
+                "font-black uppercase tracking-widest text-[10px] px-3 py-1",
+                program.status === 'Green' ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" :
+                program.status === 'Yellow' ? "bg-amber-500/10 text-amber-500 border-amber-500/20" : "bg-rose-500/10 text-rose-500 border-rose-500/20"
               )}>
                 {program.status}
               </Badge>
@@ -60,110 +63,97 @@ export default function ProgramDetailPage() {
             <p className="text-muted-foreground font-mono text-sm">{program.id}</p>
           </div>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline">Schedule Review</Button>
-          <Button className="bg-primary text-white">Create ECO</Button>
-        </div>
       </div>
 
       <div className="grid gap-6 md:grid-cols-4">
-        <Card className="bg-secondary/10">
+        <Card className="glass-card border-none bg-white/[0.03]">
           <CardContent className="pt-6">
             <div className="flex items-center gap-2 text-muted-foreground mb-2">
               <User className="h-4 w-4" />
-              <span className="text-xs font-bold uppercase tracking-wider">Program Lead</span>
+              <span className="text-[10px] font-black uppercase tracking-widest">Program Lead</span>
             </div>
-            <p className="font-semibold">{program.manager}</p>
+            <p className="font-bold text-white">{program.manager}</p>
           </CardContent>
         </Card>
-        <Card className="bg-secondary/10">
+        <Card className="glass-card border-none bg-white/[0.03]">
           <CardContent className="pt-6">
             <div className="flex items-center gap-2 text-muted-foreground mb-2">
               <MapPin className="h-4 w-4" />
-              <span className="text-xs font-bold uppercase tracking-wider">Manufacturing Site</span>
+              <span className="text-[10px] font-black uppercase tracking-widest">Manufacturing Site</span>
             </div>
-            <p className="font-semibold">{program.site}</p>
+            <p className="font-bold text-white">{program.site}</p>
           </CardContent>
         </Card>
-        <Card className="bg-secondary/10">
+        <Card className="glass-card border-none bg-white/[0.03]">
           <CardContent className="pt-6">
             <div className="flex items-center gap-2 text-muted-foreground mb-2">
               <Calendar className="h-4 w-4" />
-              <span className="text-xs font-bold uppercase tracking-wider">Timeline</span>
+              <span className="text-[10px] font-black uppercase tracking-widest">Timeline</span>
             </div>
-            <p className="font-semibold">{program.startDate} – {program.endDate}</p>
+            <p className="font-bold text-white">{program.startDate} – {program.endDate}</p>
           </CardContent>
         </Card>
-        <Card className="bg-secondary/10">
+        <Card className="glass-card border-none bg-white/[0.03]">
           <CardContent className="pt-6">
             <div className="flex items-center gap-2 text-muted-foreground mb-2">
               <Clock className="h-4 w-4" />
-              <span className="text-xs font-bold uppercase tracking-wider">Current Phase</span>
+              <span className="text-[10px] font-black uppercase tracking-widest">Current Phase</span>
             </div>
-            <p className="font-semibold">{program.phase}</p>
+            <p className="font-bold text-white">{program.phase}</p>
           </CardContent>
         </Card>
       </div>
 
       <Tabs defaultValue="timeline" className="w-full">
-        <TabsList className="grid w-full grid-cols-4 h-12 bg-secondary/20">
-          <TabsTrigger value="timeline" className="data-[state=active]:bg-white data-[state=active]:text-primary font-bold">Timeline & Gates</TabsTrigger>
-          <TabsTrigger value="artifacts" className="data-[state=active]:bg-white data-[state=active]:text-primary font-bold">Engineering / BOM</TabsTrigger>
-          <TabsTrigger value="quality" className="data-[state=active]:bg-white data-[state=active]:text-primary font-bold">Quality & Evidence</TabsTrigger>
-          <TabsTrigger value="ops" className="data-[state=active]:bg-white data-[state=active]:text-primary font-bold">Ops Drill-Down</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-4 h-12 bg-white/5 border border-white/5 rounded-xl p-1">
+          <TabsTrigger value="timeline" className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-white font-bold text-[10px] uppercase tracking-widest">Timeline & Gates</TabsTrigger>
+          <TabsTrigger value="artifacts" className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-white font-bold text-[10px] uppercase tracking-widest">Engineering / BOM</TabsTrigger>
+          <TabsTrigger value="quality" className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-white font-bold text-[10px] uppercase tracking-widest">Quality & Evidence</TabsTrigger>
+          <TabsTrigger value="ops" className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-white font-bold text-[10px] uppercase tracking-widest">Ops Drill-Down</TabsTrigger>
         </TabsList>
 
         <TabsContent value="timeline" className="space-y-6 pt-6">
           <div className="grid gap-6 md:grid-cols-3">
-            <Card className="md:col-span-2">
+            <Card className="md:col-span-2 glass-card border-none">
               <CardHeader>
-                <CardTitle>Milestone Gantt (Planned vs Actual)</CardTitle>
-                <CardDescription>Visual tracker for critical path events.</CardDescription>
+                <CardTitle className="text-lg font-black uppercase tracking-widest text-slate-300">Milestone Gantt (Planned vs Actual)</CardTitle>
+                <CardDescription className="text-xs">Visual tracker for critical path events.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 {program.milestones.map((milestone, idx) => (
                   <div key={idx} className="space-y-2">
                     <div className="flex justify-between items-center text-sm">
-                      <span className="font-medium">{milestone.name}</span>
-                      <div className="flex gap-4 text-xs font-bold uppercase">
+                      <span className="font-bold text-white">{milestone.name}</span>
+                      <div className="flex gap-4 text-[10px] font-black uppercase tracking-widest">
                         <span className="text-muted-foreground">Target: {milestone.date}</span>
-                        {milestone.actualDate && <span className="text-emerald-600">Actual: {milestone.actualDate}</span>}
+                        {milestone.actualDate && <span className="text-emerald-500">Actual: {milestone.actualDate}</span>}
                       </div>
                     </div>
-                    <div className="relative h-6 w-full bg-secondary/20 rounded-full overflow-hidden flex items-center">
-                      {/* Planned Bar */}
-                      <div 
-                        className="absolute h-2 bg-primary/20 rounded-full" 
-                        style={{ width: '100%', left: '0' }} 
-                      />
-                      {/* Actual/Status Indicator */}
+                    <div className="relative h-2 w-full bg-white/5 rounded-full overflow-hidden flex items-center">
                       <div 
                         className={cn(
-                          "absolute h-3 rounded-full transition-all",
-                          milestone.status === 'completed' ? "bg-emerald-500 w-[60%]" : 
-                          milestone.status === 'delayed' ? "bg-rose-500 w-[40%]" : "bg-amber-400 w-[20%]"
+                          "absolute h-full rounded-full transition-all",
+                          milestone.status === 'completed' ? "bg-emerald-500 w-[100%]" : 
+                          milestone.status === 'delayed' ? "bg-rose-500 w-[60%]" : "bg-amber-400 w-[20%]"
                         )}
                       />
-                      <div className="absolute right-3 flex items-center">
-                         {milestone.status === 'completed' ? <CheckCircle2 className="h-4 w-4 text-emerald-600" /> : <AlertTriangle className="h-4 w-4 text-amber-600" />}
-                      </div>
                     </div>
                   </div>
                 ))}
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="glass-card border-none">
               <CardHeader>
-                <CardTitle>Status History</CardTitle>
+                <CardTitle className="text-lg font-black uppercase tracking-widest text-slate-300">Status History</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   {program.history.map((h, i) => (
-                    <div key={i} className="flex gap-3 text-sm border-l-2 border-primary/20 pl-4 pb-4 last:pb-0">
+                    <div key={i} className="flex gap-3 text-sm border-l border-white/10 pl-4 pb-4 last:pb-0">
                       <div className="space-y-1">
-                        <p className="font-medium text-primary">{h.event}</p>
-                        <div className="flex gap-2 text-[10px] text-muted-foreground uppercase font-bold">
+                        <p className="font-bold text-primary text-xs">{h.event}</p>
+                        <div className="flex gap-2 text-[10px] text-muted-foreground uppercase font-black tracking-widest">
                           <span>{h.date}</span>
                           <span>•</span>
                           <span>{h.user}</span>
@@ -179,31 +169,31 @@ export default function ProgramDetailPage() {
 
         <TabsContent value="artifacts" className="space-y-6 pt-6">
           <div className="grid gap-6 md:grid-cols-2">
-            <Card>
+            <Card className="glass-card border-none">
               <CardHeader className="flex flex-row items-center justify-between">
                 <div>
-                  <CardTitle>Bill of Materials (BOM)</CardTitle>
-                  <CardDescription>Major assemblies and critical components.</CardDescription>
+                  <CardTitle className="text-lg font-black uppercase tracking-widest text-slate-300">Bill of Materials (BOM)</CardTitle>
+                  <CardDescription className="text-xs">Major assemblies and critical components.</CardDescription>
                 </div>
                 <Box className="h-5 w-5 text-muted-foreground" />
               </CardHeader>
               <CardContent className="p-0">
                 <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Part No</TableHead>
-                      <TableHead>Description</TableHead>
-                      <TableHead>Qty</TableHead>
-                      <TableHead>Status</TableHead>
+                  <TableHeader className="bg-white/5">
+                    <TableRow className="border-white/5">
+                      <TableHead className="text-[10px] font-black uppercase tracking-widest">Part No</TableHead>
+                      <TableHead className="text-[10px] font-black uppercase tracking-widest">Description</TableHead>
+                      <TableHead className="text-[10px] font-black uppercase tracking-widest">Qty</TableHead>
+                      <TableHead className="text-[10px] font-black uppercase tracking-widest">Status</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {program.bom.map((item, idx) => (
-                      <TableRow key={idx}>
-                        <TableCell className="font-mono text-xs">{item.partNo}</TableCell>
-                        <TableCell className="text-sm">{item.desc}</TableCell>
-                        <TableCell className="text-xs">{item.qty}</TableCell>
-                        <TableCell><Badge variant="outline" className="text-[10px]">{item.status}</Badge></TableCell>
+                      <TableRow key={idx} className="border-white/5">
+                        <TableCell className="font-mono text-[10px] font-black text-primary">{item.partNo}</TableCell>
+                        <TableCell className="text-xs font-bold text-white">{item.desc}</TableCell>
+                        <TableCell className="text-xs font-bold text-slate-400">{item.qty}</TableCell>
+                        <TableCell><Badge variant="outline" className="text-[9px] font-black uppercase tracking-widest">{item.status}</Badge></TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -211,41 +201,30 @@ export default function ProgramDetailPage() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="glass-card border-none">
               <CardHeader className="flex flex-row items-center justify-between">
                 <div>
-                  <CardTitle>Engineering Artifacts</CardTitle>
-                  <CardDescription>Specifications, CAD, and ECO logs.</CardDescription>
+                  <CardTitle className="text-lg font-black uppercase tracking-widest text-slate-300">Engineering Artifacts</CardTitle>
+                  <CardDescription className="text-xs">Specifications, CAD, and ECO logs.</CardDescription>
                 </div>
                 <FileText className="h-5 w-5 text-muted-foreground" />
               </CardHeader>
               <CardContent className="space-y-4">
                  <div className="space-y-3">
                    {program.artifacts.map((art) => (
-                     <div key={art.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-secondary/10 transition-colors">
+                     <div key={art.id} className="flex items-center justify-between p-3 border border-white/5 rounded-xl hover:bg-white/5 transition-colors">
                        <div className="flex items-center gap-3">
-                         <div className="p-2 bg-secondary rounded text-primary">
+                         <div className="p-2 bg-primary/10 rounded-lg text-primary">
                            <FileText className="h-4 w-4" />
                          </div>
                          <div>
-                           <p className="text-sm font-medium">{art.name}</p>
-                           <p className="text-[10px] text-muted-foreground uppercase font-bold">v{art.version} • {art.type}</p>
+                           <p className="text-xs font-bold text-white">{art.name}</p>
+                           <p className="text-[9px] text-muted-foreground uppercase font-black tracking-widest">v{art.version} • {art.type}</p>
                          </div>
                        </div>
-                       <Badge variant="secondary" className="text-[10px]">{art.status}</Badge>
+                       <Badge variant="secondary" className="text-[9px] font-black uppercase tracking-widest bg-white/5">{art.status}</Badge>
                      </div>
                    ))}
-                 </div>
-                 <div className="pt-4 border-t">
-                    <h4 className="text-sm font-semibold mb-3 flex items-center gap-2">
-                      <History className="h-4 w-4" /> Active ECOs
-                    </h4>
-                    {program.eco.map((eco) => (
-                      <div key={eco.id} className="flex justify-between items-center text-sm p-2 bg-secondary/5 rounded">
-                        <span>{eco.id}: {eco.title}</span>
-                        <Badge className="bg-rose-500 text-[10px]">{eco.impact} Impact</Badge>
-                      </div>
-                    ))}
                  </div>
               </CardContent>
             </Card>
@@ -253,115 +232,85 @@ export default function ProgramDetailPage() {
         </TabsContent>
 
         <TabsContent value="quality" className="space-y-6 pt-6">
-           <Card>
+           <Card className="glass-card border-none">
              <CardHeader className="flex flex-row items-center justify-between">
                <div>
-                 <CardTitle>Evidence & Compliance Repository</CardTitle>
-                 <CardDescription>FAI, PPAP, and Test Plan artifacts for release readiness.</CardDescription>
+                 <CardTitle className="text-lg font-black uppercase tracking-widest text-slate-300">Evidence & Compliance Repository</CardTitle>
+                 <CardDescription className="text-xs">FAI, PPAP, and Test Plan artifacts for release readiness.</CardDescription>
                </div>
                <ClipboardList className="h-5 w-5 text-muted-foreground" />
              </CardHeader>
              <CardContent className="p-0">
                <Table>
-                 <TableHeader>
-                   <TableRow>
-                     <TableHead>Asset Name</TableHead>
-                     <TableHead>Type</TableHead>
-                     <TableHead>Upload Date</TableHead>
-                     <TableHead>Sign-Off</TableHead>
-                     <TableHead className="text-right">Action</TableHead>
+                 <TableHeader className="bg-white/5">
+                   <TableRow className="border-white/5">
+                     <TableHead className="text-[10px] font-black uppercase tracking-widest pl-8">Asset Name</TableHead>
+                     <TableHead className="text-[10px] font-black uppercase tracking-widest">Type</TableHead>
+                     <TableHead className="text-[10px] font-black uppercase tracking-widest">Upload Date</TableHead>
+                     <TableHead className="text-[10px] font-black uppercase tracking-widest">Sign-Off</TableHead>
+                     <TableHead className="text-right text-[10px] font-black uppercase tracking-widest pr-8">Action</TableHead>
                    </TableRow>
                  </TableHeader>
                  <TableBody>
                    {program.evidence.map((ev) => (
-                     <TableRow key={ev.id}>
-                       <TableCell className="font-medium text-primary">{ev.name}</TableCell>
-                       <TableCell><Badge variant="outline">{ev.type}</Badge></TableCell>
-                       <TableCell className="text-xs text-muted-foreground">{ev.date}</TableCell>
+                     <TableRow key={ev.id} className="border-white/5">
+                       <TableCell className="font-bold text-white text-xs pl-8">{ev.name}</TableCell>
+                       <TableCell><Badge variant="outline" className="text-[9px] font-black tracking-widest uppercase">{ev.type}</Badge></TableCell>
+                       <TableCell className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">{ev.date}</TableCell>
                        <TableCell>
                          {ev.signedBy ? (
-                           <div className="flex items-center gap-1 text-emerald-600 text-xs font-bold">
+                           <div className="flex items-center gap-1 text-emerald-500 text-[10px] font-black uppercase tracking-widest">
                              <CheckCircle2 className="h-3 w-3" /> {ev.signedBy}
                            </div>
                          ) : (
-                           <span className="text-[10px] text-muted-foreground uppercase font-bold">Pending</span>
+                           <span className="text-[9px] text-muted-foreground uppercase font-black tracking-widest">Pending</span>
                          )}
                        </TableCell>
-                       <TableCell className="text-right">
-                         <Button variant="ghost" size="sm">Download</Button>
+                       <TableCell className="text-right pr-8">
+                         <Button variant="ghost" size="sm" className="text-[9px] font-black uppercase tracking-widest rounded-lg hover:bg-primary">Download</Button>
                        </TableCell>
                      </TableRow>
                    ))}
-                   {program.evidence.length === 0 && (
-                     <TableRow>
-                       <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">No evidence uploaded for this program yet.</TableCell>
-                     </TableRow>
-                   )}
                  </TableBody>
                </Table>
-               <div className="p-6 border-t flex justify-center">
-                  <Button variant="outline" className="border-dashed w-full max-w-md">
-                    + Upload PPAP/FAI Evidence
-                  </Button>
-               </div>
              </CardContent>
            </Card>
         </TabsContent>
 
         <TabsContent value="ops" className="space-y-6 pt-6">
           <div className="grid gap-6 md:grid-cols-2">
-            <Card>
+            <Card className="glass-card border-none">
               <CardHeader>
-                <CardTitle>Manufacturing Stage Progress</CardTitle>
-                <CardDescription>Live telemetry from line {program.site} operations.</CardDescription>
+                <CardTitle className="text-lg font-black uppercase tracking-widest text-slate-300">Manufacturing Stage Progress</CardTitle>
+                <CardDescription className="text-xs">Live telemetry from site operations.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span>Assembly Station 1 (Chassis)</span>
-                    <span className="font-bold">98% OEE</span>
+                  <div className="flex justify-between text-[10px] font-black uppercase tracking-widest">
+                    <span className="text-slate-400">Assembly Station 1 (Chassis)</span>
+                    <span className="text-emerald-500">98% OEE</span>
                   </div>
-                  <Progress value={98} className="h-2 bg-emerald-100" />
+                  <Progress value={98} className="h-1 bg-white/5" />
                 </div>
                 <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span>Assembly Station 2 (Internal)</span>
-                    <span className="font-bold">72% OEE</span>
+                  <div className="flex justify-between text-[10px] font-black uppercase tracking-widest">
+                    <span className="text-slate-400">Assembly Station 2 (Internal)</span>
+                    <span className="text-amber-500">72% OEE</span>
                   </div>
-                  <Progress value={72} className="h-2 bg-amber-100" />
-                  <p className="text-[10px] text-rose-500 font-bold uppercase flex items-center gap-1">
-                    <AlertTriangle className="h-3 w-3" /> Potential Bottleneck - Heat Sync Station
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span>Final QC & Packout</span>
-                    <span className="font-bold">94% OEE</span>
-                  </div>
-                  <Progress value={94} className="h-2 bg-emerald-100" />
+                  <Progress value={72} className="h-1 bg-white/5" />
                 </div>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="glass-card border-none">
               <CardHeader>
-                <CardTitle>Throughput & Cycle Time</CardTitle>
-                <CardDescription>Real-time shift metrics for {program.name}.</CardDescription>
+                <CardTitle className="text-lg font-black uppercase tracking-widest text-slate-300">Throughput & Cycle Time</CardTitle>
+                <CardDescription className="text-xs">Real-time shift metrics for {program.name}.</CardDescription>
               </CardHeader>
               <CardContent className="flex items-center justify-center h-[200px]">
                 <div className="text-center space-y-2">
-                  <p className="text-4xl font-bold text-primary">4.2m</p>
-                  <p className="text-sm text-muted-foreground uppercase font-bold tracking-widest">Avg Cycle Time</p>
-                  <div className="flex gap-4 mt-4">
-                    <div className="bg-secondary/50 p-2 rounded px-4">
-                      <p className="text-lg font-bold">142</p>
-                      <p className="text-[10px] uppercase text-muted-foreground">Output Today</p>
-                    </div>
-                    <div className="bg-secondary/50 p-2 rounded px-4">
-                      <p className="text-lg font-bold">150</p>
-                      <p className="text-[10px] uppercase text-muted-foreground">Target</p>
-                    </div>
-                  </div>
+                  <p className="text-5xl font-black text-primary tracking-tighter">4.2m</p>
+                  <p className="text-[10px] text-muted-foreground uppercase font-black tracking-widest">Avg Cycle Time</p>
                 </div>
               </CardContent>
             </Card>
@@ -370,8 +319,4 @@ export default function ProgramDetailPage() {
       </Tabs>
     </div>
   );
-}
-
-function cn(...inputs: any[]) {
-  return inputs.filter(Boolean).join(" ");
 }

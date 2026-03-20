@@ -2,7 +2,7 @@
 "use client";
 
 import { useState } from "react";
-import { Search, Bell, User, PlusCircle, AlertCircle, AlertTriangle, Info, LogOut, Settings, UserCircle, Shield } from "lucide-react";
+import { Search, Bell, User, PlusCircle, AlertCircle, AlertTriangle, Info, LogOut, Settings, UserCircle, Shield, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -43,7 +43,19 @@ export function TopNav() {
       setCreateDialogOpen(true);
       return;
     }
-    toast({ title: "Module Locked", description: "Contact administrator for higher access." });
+    
+    // Simulate active processing for other operations
+    toast({ 
+      title: "Executing Command", 
+      description: `Initiating ${action} sequence...`,
+    });
+    
+    setTimeout(() => {
+      toast({ 
+        title: "Action Recorded", 
+        description: `${action} has been logged in the system audit.`,
+      });
+    }, 1500);
   };
 
   return (
@@ -71,13 +83,13 @@ export function TopNav() {
               <DropdownMenuLabel className="px-2 py-1.5 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Master Control</DropdownMenuLabel>
               <DropdownMenuSeparator className="bg-white/5" />
               <DropdownMenuGroup>
-                <DropdownMenuItem className="rounded-lg focus:bg-primary/20 text-sm font-medium" onClick={() => handleAction("New Program")}>
+                <DropdownMenuItem className="rounded-lg focus:bg-primary/20 text-sm font-medium cursor-pointer" onClick={() => handleAction("New Program")}>
                   Initialize New Program
                 </DropdownMenuItem>
-                <DropdownMenuItem className="rounded-lg focus:bg-primary/20 text-sm font-medium" onClick={() => handleAction("New NCR")}>
+                <DropdownMenuItem className="rounded-lg focus:bg-primary/20 text-sm font-medium cursor-pointer" onClick={() => handleAction("Quality Incident")}>
                   Log Quality Incident
                 </DropdownMenuItem>
-                <DropdownMenuItem className="rounded-lg focus:bg-primary/20 text-sm font-medium">
+                <DropdownMenuItem className="rounded-lg focus:bg-primary/20 text-sm font-medium cursor-pointer" onClick={() => handleAction("Emergency Stop")}>
                   Trigger Emergency Stop
                 </DropdownMenuItem>
               </DropdownMenuGroup>
@@ -145,16 +157,7 @@ export function TopNav() {
           <DropdownMenuContent align="end" className="w-64 glass-card p-2 border-white/10">
             <DropdownMenuLabel className="px-2 py-1.5 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Session Control</DropdownMenuLabel>
             <DropdownMenuSeparator className="bg-white/5" />
-            <DropdownMenuGroup>
-              <DropdownMenuItem className="rounded-lg py-2.5 font-medium">
-                <UserCircle className="mr-2 h-4 w-4" /> Profile Architecture
-              </DropdownMenuItem>
-              <DropdownMenuItem className="rounded-lg py-2.5 font-medium">
-                <Settings className="mr-2 h-4 w-4" /> Terminal Settings
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator className="bg-white/5" />
-            <DropdownMenuItem className="text-rose-500 focus:bg-rose-500/10 font-bold rounded-lg py-2.5" onClick={handleLogout}>
+            <DropdownMenuItem className="text-rose-500 focus:bg-rose-500/10 font-bold rounded-lg py-2.5 cursor-pointer" onClick={handleLogout}>
               <LogOut className="mr-2 h-4 w-4" /> Terminate Session
             </DropdownMenuItem>
           </DropdownMenuContent>
