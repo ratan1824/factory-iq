@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useMemo } from "react";
@@ -26,10 +27,8 @@ export default function ProgramsPage() {
   );
   const { data: firestorePrograms, isLoading } = useCollection<Program>(programsQuery);
 
-  // Merge Firestore data with Mock data for a "full" portfolio feel during prototyping
   const allPrograms = useMemo(() => {
     const fsData = firestorePrograms || [];
-    // Filter out mock programs that might have the same ID as real ones
     const fsIds = new Set(fsData.map(p => p.id));
     return [...fsData, ...MOCK_PROGRAMS.filter(p => !fsIds.has(p.id))];
   }, [firestorePrograms]);
@@ -65,88 +64,88 @@ export default function ProgramsPage() {
     <div className="space-y-8 animate-in slide-in-from-bottom-2 duration-500">
       <div className="flex items-end justify-between">
         <div>
-          <h1 className="page-heading">Program Portfolio</h1>
+          <h1 className="text-5xl font-black tracking-tighter text-white py-1">Program Portfolio</h1>
           <p className="text-muted-foreground mt-1 text-sm font-medium">Global engineering lifecycle and NPI milestone visibility.</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" className="glass-card border-white/10 hover:bg-white/5">
+          <Button variant="outline" size="sm" className="glass-card border-white/10 hover:bg-white/5 text-xs font-bold uppercase tracking-widest h-10 px-6">
             <Filter className="mr-2 h-4 w-4" /> Filter
           </Button>
-          <Button variant="outline" size="sm" className="glass-card border-white/10 hover:bg-white/5">
-            <Download className="mr-2 h-4 w-4" /> Export CSV
+          <Button variant="outline" size="sm" className="glass-card border-white/10 hover:bg-white/5 text-xs font-bold uppercase tracking-widest h-10 px-6">
+            <Download className="mr-2 h-4 w-4" /> Export
           </Button>
         </div>
       </div>
 
       <div className="flex items-center gap-4 glass-card p-4 rounded-2xl border-white/10">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
           <Input 
             placeholder="Search by name, ID or manager..." 
-            className="pl-9 bg-white/5 border-none h-11 focus-visible:ring-primary/20 text-white" 
+            className="pl-11 bg-white/5 border-none h-12 focus-visible:ring-primary/20 text-white placeholder:text-slate-600 rounded-xl" 
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
         <div className="flex gap-2 items-center">
           {isLoading && <Loader2 className="h-4 w-4 animate-spin text-primary mr-2" />}
-          <Badge variant="secondary" className="px-4 py-1.5 rounded-full bg-primary/20 text-primary-foreground border-none font-bold uppercase tracking-wider text-[10px]">{filteredPrograms.length} Total</Badge>
+          <Badge variant="secondary" className="px-6 py-2 rounded-xl bg-white/5 text-slate-300 border-none font-black uppercase tracking-widest text-[10px]">{filteredPrograms.length} Total</Badge>
         </div>
       </div>
 
-      <Card className="glass-card border-none overflow-hidden rounded-2xl shadow-2xl">
+      <Card className="glass-card border-none overflow-hidden rounded-3xl shadow-2xl bg-white/[0.01]">
         <CardContent className="p-0">
           <Table>
             <TableHeader className="bg-white/5">
               <TableRow className="hover:bg-transparent border-white/5">
-                <TableHead className="cursor-pointer hover:text-primary transition-colors py-4 text-slate-300 font-bold uppercase tracking-widest text-[10px]" onClick={() => toggleSort("name")}>
+                <TableHead className="cursor-pointer hover:text-white transition-colors py-5 text-slate-500 font-black uppercase tracking-widest text-[10px] pl-8" onClick={() => toggleSort("name")}>
                   Program <ArrowUpDown className="inline ml-1 h-3 w-3" />
                 </TableHead>
-                <TableHead className="cursor-pointer hover:text-primary transition-colors text-slate-300 font-bold uppercase tracking-widest text-[10px]" onClick={() => toggleSort("status")}>
+                <TableHead className="cursor-pointer hover:text-white transition-colors text-slate-500 font-black uppercase tracking-widest text-[10px]" onClick={() => toggleSort("status")}>
                   Status <ArrowUpDown className="inline ml-1 h-3 w-3" />
                 </TableHead>
-                <TableHead className="text-slate-300 font-bold uppercase tracking-widest text-[10px]">Site</TableHead>
-                <TableHead className="text-slate-300 font-bold uppercase tracking-widest text-[10px]">Manager</TableHead>
-                <TableHead className="text-slate-300 font-bold uppercase tracking-widest text-[10px]">Phase</TableHead>
-                <TableHead className="w-[200px] text-slate-300 font-bold uppercase tracking-widest text-[10px]">Completion</TableHead>
-                <TableHead className="text-right text-slate-300 font-bold uppercase tracking-widest text-[10px]">View</TableHead>
+                <TableHead className="text-slate-500 font-black uppercase tracking-widest text-[10px]">Site</TableHead>
+                <TableHead className="text-slate-500 font-black uppercase tracking-widest text-[10px]">Manager</TableHead>
+                <TableHead className="text-slate-500 font-black uppercase tracking-widest text-[10px]">Phase</TableHead>
+                <TableHead className="w-[200px] text-slate-500 font-black uppercase tracking-widest text-[10px]">Completion</TableHead>
+                <TableHead className="text-right text-slate-500 font-black uppercase tracking-widest text-[10px] pr-8">View</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredPrograms.map((program) => (
-                <TableRow key={program.id} className="group hover:bg-white/5 transition-colors border-white/5">
-                  <TableCell>
+                <TableRow key={program.id} className="group hover:bg-white/[0.03] transition-colors border-white/5">
+                  <TableCell className="pl-8">
                     <div className="flex flex-col">
-                      <span className="font-semibold text-white">{program.name}</span>
-                      <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest leading-relaxed">{program.id}</span>
+                      <span className="font-bold text-white text-base">{program.name}</span>
+                      <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-relaxed">{program.id}</span>
                     </div>
                   </TableCell>
                   <TableCell>
                     <Badge className={cn(
-                      "font-bold px-3 py-0.5 rounded-full text-[10px] uppercase tracking-wider",
-                      program.status === 'Green' ? "bg-emerald-500 hover:bg-emerald-600" :
-                      program.status === 'Yellow' ? "bg-amber-500 hover:bg-amber-600" : "bg-rose-500 hover:bg-rose-600"
+                      "font-black px-3 py-1 rounded-lg text-[9px] uppercase tracking-widest",
+                      program.status === 'Green' ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" :
+                      program.status === 'Yellow' ? "bg-amber-500/10 text-amber-500 border-amber-500/20" : "bg-rose-500/10 text-rose-500 border-rose-500/20"
                     )}>
                       {program.status}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-xs font-medium text-slate-400">{program.site}</TableCell>
-                  <TableCell className="text-sm text-slate-400 font-medium">{program.manager || 'N/A'}</TableCell>
+                  <TableCell className="text-xs font-semibold text-slate-400">{program.site}</TableCell>
+                  <TableCell className="text-sm text-slate-400 font-semibold">{program.manager || 'N/A'}</TableCell>
                   <TableCell>
-                    <Badge variant="outline" className="border-accent/20 text-accent bg-accent/10 rounded-full text-[10px] font-bold uppercase tracking-widest px-3">{program.phase}</Badge>
+                    <Badge variant="outline" className="border-accent/20 text-accent bg-accent/5 rounded-lg text-[9px] font-black uppercase tracking-widest px-3 py-1">{program.phase}</Badge>
                   </TableCell>
                   <TableCell>
                     <div className="space-y-1.5">
-                      <div className="flex justify-between text-[9px] font-black uppercase text-muted-foreground tracking-[0.1em]">
-                        <span>{program.completion || 0}% COMPLETED</span>
+                      <div className="flex justify-between text-[9px] font-black uppercase text-slate-500 tracking-widest">
+                        <span>{program.completion || 0}%</span>
                       </div>
                       <Progress value={program.completion || 0} className="h-1.5 bg-white/5" />
                     </div>
                   </TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="text-right pr-8">
                     <Link href={`/programs/${program.id}`}>
-                      <Button variant="ghost" size="sm" className="rounded-full hover:bg-primary hover:text-white transition-all font-bold text-[11px] uppercase tracking-wider">
-                        Explore <ChevronRight className="ml-1 h-3 w-3" />
+                      <Button variant="ghost" size="sm" className="rounded-xl hover:bg-primary hover:text-white transition-all font-black text-[10px] uppercase tracking-widest">
+                        Detail <ChevronRight className="ml-1 h-3 w-3" />
                       </Button>
                     </Link>
                   </TableCell>
